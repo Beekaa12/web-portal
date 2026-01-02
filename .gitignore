@@ -7,11 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -56,3 +51,4 @@ public/_nuxt
 coverage
 reports
 nyc_outputs
+node_modules
