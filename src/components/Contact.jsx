@@ -62,7 +62,7 @@ const Contact = () => {
           }}
         ></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">et In Touch</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Get In Touch</h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
             We'd love to hear from you! Send us a message and we'll respond as
             soon as possible.

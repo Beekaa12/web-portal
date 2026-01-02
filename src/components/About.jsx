@@ -16,7 +16,7 @@ const About = () => {
         ></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            About Our SACCO
+            About Us
           </h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
             Empowering our community through financial inclusion, trust, and

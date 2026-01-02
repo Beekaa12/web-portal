@@ -12,7 +12,6 @@ const Hero = () => {
     alignItems: 'center',
     justifyContent: 'center',
     color: 'white',
-    marginBottom: '2rem',
   };
 
   const overlayStyle = {
@@ -37,7 +36,7 @@ const Hero = () => {
     <section style={heroStyle}>
       <div style={overlayStyle}></div>
       <div style={contentStyle}>
-        <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Our SACCO</h1>
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Our Union</h1>
         <p className="text-xl md:text-2xl mb-8 text-blue-100">
           Empowering members through financial growth and community support
         </p>

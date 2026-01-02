@@ -9,6 +9,7 @@ import Leaders from "./components/Leaders";
 import Contact from "./components/Contact";
 import DownloadForms from "./components/DownloadForms";
 import Footer from "./components/Footer";
+import Divider from "./components/Divider";
 
 const App = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,16 +34,13 @@ const App = () => {
       >
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center">
-              <span
-                className={`text-2xl font-bold ${
-                  isScrolled ? "text-white" : "text-white"
-                }`}
-              >
-                SACCO
-              </span>
+            <Link to="/" className="flex items-center gap-2">
+              <img
+                src="/logo.jpg"
+                alt="logo"
+                className="h-10 w-18 object-cover rounded-sm"
+              />
             </Link>
-
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-1">
               <Link
@@ -174,6 +172,7 @@ const App = () => {
             element={
               <>
                 <Hero />
+                <Divider />
                 <Announcements />
                 <About />
                 <Services />
