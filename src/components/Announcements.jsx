@@ -1,113 +1,88 @@
-import React, { useState } from 'react';
-
-const announcements = [
-  {
-    id: 1,
-    title: 'Annual General Meeting 2024',
-    date: '2024-03-15',
-    excerpt: 'Join us for our most important event of the year where we will review our achievements and set the course for the future.',
-    category: 'Meeting',
-    image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-    content: `
-      <p>We are excited to invite all our valued members to our Annual General Meeting 2024. This is a crucial event where we will:</p>
-      <ul class="list-disc pl-5 mt-2 space-y-1">
-        <li>Review the financial performance of the past year</li>
-        <li>Present the audited financial statements</li>
-        <li>Elect new board members</li>
-        <li>Discuss and approve the annual budget</li>
-        <li>Share our strategic plan for the coming year</li>
-      </ul>
-      <p class="mt-3">Date: March 15, 2024<br>
-      Time: 9:00 AM - 2:00 PM<br>
-      Venue: SACCO Headquarters, Main Hall</p>
-      <p class="mt-2">Lunch and refreshments will be served. Please confirm your attendance by March 10th.</p>
-    `
-  },
-  {
-    id: 2,
-    title: 'New Loan Products Launch',
-    date: '2024-03-10',
-    excerpt: 'Introducing our new range of loan products designed to meet all your financial needs with competitive rates.',
-    category: 'Update',
-    image: 'https://images.unsplash.com/photo-1579621970795-87facc2f976d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-    content: `
-      <p>We're excited to announce our new loan products tailored to help you achieve your financial goals:</p>
-      <div class="mt-3 space-y-3">
-        <div class="bg-blue-50 p-3 rounded-lg">
-          <h4 class="font-semibold text-blue-800">Business Expansion Loan</h4>
-          <p class="text-sm text-gray-700">Up to Ksh 5,000,000 at 12% p.a. with flexible repayment terms up to 36 months.</p>
-        </div>
-        <div class="bg-green-50 p-3 rounded-lg">
-          <h4 class="font-semibold text-green-800">School Fees Loan</h4>
-          <p class="text-sm text-gray-700">Get up to Ksh 200,000 for school fees at 10% p.a. with repayment up to 12 months.</p>
-        </div>
-        <div class="bg-purple-50 p-3 rounded-lg">
-          <h4 class="font-semibold text-purple-800">Asset Financing</h4>
-          <p class="text-sm text-gray-700">Finance up to 80% of the asset value at competitive rates.</p>
-        </div>
-      </div>
-      <p class="mt-3">Visit any of our branches or contact our customer care for more information.</p>
-    `
-  },
-  {
-    id: 3,
-    title: 'Easter Holiday Notice',
-    date: '2024-04-01',
-    excerpt: 'Important information about our operating hours during the upcoming Easter holidays.',
-    category: 'Notice',
-    image: 'https://images.unsplash.com/photo-1511988617509-a57c8a288659?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80',
-    content: `
-      <p>Please be informed of our operating hours during the Easter holiday period:</p>
-      <div class="mt-3 space-y-2">
-        <div class="flex justify-between border-b pb-1">
-          <span>Good Friday (April 7):</span>
-          <span class="font-medium">Closed</span>
-        </div>
-        <div class="flex justify-between border-b pb-1">
-          <span>Holy Saturday (April 8):</span>
-          <span class="font-medium">9:00 AM - 1:00 PM</span>
-        </div>
-        <div class="flex justify-between border-b pb-1">
-          <span>Easter Sunday (April 9):</span>
-          <span class="font-medium">Closed</span>
-        </div>
-        <div class="flex justify-between">
-          <span>Easter Monday (April 10):</span>
-          <span class="font-medium">10:00 AM - 2:00 PM</span>
-        </div>
-      </div>
-      <p class="mt-4">Our digital banking services will remain available 24/7 during this period. We apologize for any inconvenience caused.</p>
-    `
-  }
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Announcements = () => {
+  const [announcements, setAnnouncements] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const timeAgo = (date) => {
+    const now = new Date();
+    const then = new Date(date);
+    const seconds = Math.floor((now - then) / 1000);
+
+    if (seconds < 60) return "just now";
+
+    const intervals = [
+      { label: "year", seconds: 31536000 },
+      { label: "month", seconds: 2592000 },
+      { label: "week", seconds: 604800 },
+      { label: "day", seconds: 86400 },
+      { label: "hour", seconds: 3600 },
+      { label: "minute", seconds: 60 },
+    ];
+
+    for (let i = 0; i < intervals.length; i++) {
+      const interval = Math.floor(seconds / intervals[i].seconds);
+      if (interval >= 1) {
+        return `${interval} ${intervals[i].label}${
+          interval > 1 ? "s" : ""
+        } ago`;
+      }
+    }
+
+    return "just now";
+  };
+
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${API_URL}/api/announcements`);
+        setAnnouncements(res.data.data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch announcements.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
 
   const openModal = (announcement) => {
     setSelectedAnnouncement(announcement);
     setIsModalOpen(true);
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    document.body.style.overflow = 'unset';
+    document.body.style.overflow = "unset";
   };
 
   const getCategoryColor = (category) => {
-    switch(category) {
-      case 'Meeting':
-        return 'bg-blue-100 text-blue-800';
-      case 'Update':
-        return 'bg-green-100 text-green-800';
-      case 'Notice':
-        return 'bg-amber-100 text-amber-800';
+    switch (category) {
+      case "Meeting":
+        return "bg-blue-100 text-blue-800";
+      case "Update":
+        return "bg-green-100 text-green-800";
+      case "Notice":
+        return "bg-amber-100 text-amber-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
+
+  if (loading)
+    return <p className="text-center py-16">Loading announcements...</p>;
+  if (error) return <p className="text-center py-16 text-red-500">{error}</p>;
 
   return (
     <div className="bg-gradient-to-b from-blue-50 to-white">
@@ -137,7 +112,7 @@ const Announcements = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {announcements.map((announcement) => (
               <div
-                key={announcement.id}
+                key={announcement._id || announcement.id}
                 className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full border border-gray-100"
               >
                 <div className="h-48 overflow-hidden">
@@ -157,18 +132,14 @@ const Announcements = () => {
                       {announcement.category}
                     </span>
                     <span className="text-sm text-gray-500 font-medium">
-                      {new Date(announcement.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {timeAgo(announcement.createdAt)}
                     </span>
                   </div>
                   <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">
                     {announcement.title}
                   </h3>
                   <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">
-                    {announcement.excerpt}
+                    {announcement.content}
                   </p>
                   <button
                     onClick={() => openModal(announcement)}
@@ -192,25 +163,6 @@ const Announcements = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <button className="px-8 py-3 bg-[#1e3a5f] text-white rounded-full font-medium hover:bg-opacity-90 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center mx-auto group">
-              View All Announcements
-              <svg
-                className="w-4 h-4 ml-2 transition-transform group-hover:translate-y-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
           </div>
         </div>
 
