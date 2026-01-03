@@ -3,6 +3,7 @@ import axios from "axios";
 
 const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6); // show first 6 initially
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -79,9 +80,15 @@ const Announcements = () => {
     }
   };
 
+  const handleSeeMore = () => {
+    setVisibleCount((prev) => prev + 6); // load 6 more each click
+  };
+
   if (loading)
     return <p className="text-center py-16">Loading announcements...</p>;
   if (error) return <p className="text-center py-16 text-red-500">{error}</p>;
+
+  const visibleAnnouncements = announcements.slice(0, visibleCount);
 
   return (
     <div className="bg-gradient-to-b from-blue-50 to-white">
@@ -109,7 +116,7 @@ const Announcements = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {announcements.map((announcement) => (
+            {visibleAnnouncements.map((announcement) => (
               <div
                 key={announcement._id || announcement.id}
                 className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full border border-gray-100"
@@ -163,6 +170,18 @@ const Announcements = () => {
               </div>
             ))}
           </div>
+
+          {/* See More Button */}
+          {visibleCount < announcements.length && (
+            <div className="text-center mt-8">
+              <button
+                onClick={handleSeeMore}
+                className="px-6 py-3 text-[#1e3a5f] font-extrabold hover:underline transition-all rounded-lg border border-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white"
+              >
+                See More
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Announcement Modal */}
@@ -248,5 +267,4 @@ const Announcements = () => {
     </div>
   );
 };
-
 export default Announcements;
