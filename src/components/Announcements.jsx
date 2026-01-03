@@ -3,7 +3,7 @@ import axios from "axios";
 
 const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(6); // show first 6 initially
+  const [visibleCount, setVisibleCount] = useState(6); 
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -81,7 +81,7 @@ const Announcements = () => {
   };
 
   const handleSeeMore = () => {
-    setVisibleCount((prev) => prev + 6); // load 6 more each click
+    setVisibleCount((prev) => prev + 6);
   };
 
   if (loading)
