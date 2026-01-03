@@ -210,15 +210,8 @@ const Announcements = () => {
                   >
                     {selectedAnnouncement.category}
                   </span>
-                  <span className="text-sm text-gray-500">
-                    {new Date(selectedAnnouncement.date).toLocaleDateString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
+                  <span className="text-sm text-gray-500 font-medium">
+                    {timeAgo(announcement.createdAt)}
                   </span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
