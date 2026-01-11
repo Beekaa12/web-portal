@@ -1,75 +1,122 @@
-import React from 'react';
-
-const leaders = [
-  {
-    id: 1,
-    name: 'John Mwangi',
-    position: 'Chairman',
-    image: 'https://randomuser.me/api/portraits/men/32.jpg',
-    bio: 'Over 15 years of experience in financial management and leadership roles.'
-  },
-  {
-    id: 2,
-    name: 'Sarah Wanjiku',
-    position: 'Vice Chairman',
-    image: 'https://randomuser.me/api/portraits/women/44.jpg',
-    bio: 'Expert in cooperative management with a passion for community development.'
-  },
-  {
-    id: 3,
-    name: 'David Ochieng',
-    position: 'Treasurer',
-    image: 'https://randomuser.me/api/portraits/men/75.jpg',
-    bio: 'Certified accountant with extensive experience in financial planning.'
-  },
-  {
-    id: 4,
-    name: 'Grace Akinyi',
-    position: 'Secretary',
-    image: 'https://randomuser.me/api/portraits/women/63.jpg',
-    bio: 'Dedicated to transparent communication and efficient administration.'
-  }
-];
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { FaEnvelope, FaPhoneAlt, FaUserTie, FaBuilding } from "react-icons/fa";
 
 const Leaders = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchLeaders = async () => {
+      try {
+        setLoading(true);
+
+        const roles = ["manager", "accountant", "committee"];
+
+        const requests = roles.map((role) =>
+          axios.get(`${import.meta.env.VITE_API_URL}/api/users/role/${role}`)
+        );
+
+        const responses = await Promise.all(requests);
+
+        const leaders = responses.flatMap((res) =>
+          res.data.success ? res.data.data : []
+        );
+
+        setUsers(leaders);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load leaders information.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaders();
+  }, []);
+
+  if (loading) {
+    return (
+      <p className="text-center py-12 text-gray-600">Loading leaders...</p>
+    );
+  }
+
+  if (error) {
+    return <p className="text-center py-12 text-red-500">{error}</p>;
+  }
+
   return (
-    <section className="py-16 bg-blue-50">
-      <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-[#1e3a5f] mb-2">Our Leaders</h2>
-          <div className="w-20 h-1 bg-blue-500 mx-auto"></div>
-          <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
-            Meet the dedicated team leading our SACCO towards a brighter financial future for all members.
+    <section className="py-20 bg-blue-50">
+      <div className="container mx-auto px-6 lg:px-12">
+        {/* Section Header */}
+        <div className="text-center mb-14">
+          <h2 className="text-4xl font-bold text-[#1e3a5f] mb-3">
+            Our Leadership Team
+          </h2>
+          <div className="w-24 h-1 bg-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Meet the dedicated professionals guiding the Injibara University
+            Employees Savings and Credit Cooperative Union.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {leaders.map((leader) => (
-            <div key={leader.id} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-blue-100 flex items-center justify-center">
-                <img 
-                  src={leader.image} 
-                  alt={leader.name} 
-                  className="w-32 h-32 rounded-full border-4 border-white shadow-md"
-                />
+        {/* Cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+            >
+              {/* Avatar */}
+              <div className="h-52 bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center">
+                {user.profile_image ? (
+                  <img
+                    src={user.profile_image}
+                    alt={user.full_name}
+                    className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full bg-[#1e3a5f] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                    {user.full_name
+                      ?.split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </div>
+                )}
               </div>
+
+              {/* Content */}
               <div className="p-6 text-center">
-                <h3 className="text-xl font-semibold text-gray-800">{leader.name}</h3>
-                <p className="text-blue-600 font-medium mb-3">{leader.position}</p>
-                <p className="text-gray-600 text-sm">{leader.bio}</p>
-                <div className="mt-4 flex justify-center space-x-3">
-                  <a href="#" className="text-blue-500 hover:text-blue-700">
-                    <span className="sr-only">LinkedIn</span>
-                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                  </a>
-                  <a href="#" className="text-blue-500 hover:text-blue-700">
-                    <span className="sr-only">Twitter</span>
-                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                    </svg>
-                  </a>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-gray-800 truncate">
+                    {user.full_name}
+                  </h3>
+
+                  <span className="flex items-center gap-1 text-sm font-medium text-blue-600 capitalize">
+                    <FaUserTie className="text-xs" />
+                    {user.role}
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <FaEnvelope className="text-blue-500" />
+                    <span className="truncate">{user.email}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <FaPhoneAlt className="text-blue-500" />
+                    <span>{user.phone}</span>
+                  </div>
+
+                  {/* Office Number */}
+                  <div className="flex items-center gap-2">
+                    <FaBuilding className="text-blue-500" />
+                    <span>Registrar building 2nd floor 208 room</span>
+                  </div>
                 </div>
               </div>
             </div>
