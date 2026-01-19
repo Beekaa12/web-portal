@@ -1,51 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-    rating: 0,
-    file: null
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: files ? files[0] : value
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRating = (rating) => {
-    setFormData(prev => ({ ...prev, rating }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      console.log('Form submitted:', formData);
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      // Reset form after submission
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-        rating: 0,
-        file: null
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:5000/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to submit feedback");
+      }
+
+      setIsSubmitted(true);
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+
       // Hide success message after 5 seconds
       setTimeout(() => setIsSubmitted(false), 5000);
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,7 +77,6 @@ const Contact = () => {
       {/* Main Content */}
       <section id="contact" className="py-16 bg-white">
         <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-
           <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 md:p-10">
             {isSubmitted && (
               <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded">
@@ -84,9 +87,16 @@ const Contact = () => {
               </div>
             )}
 
+            {error && (
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-8 rounded">
+                <p className="font-medium">Error</p>
+                <p>{error}</p>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div className="form-group">
+                <div>
                   <label
                     htmlFor="name"
                     className="block text-gray-700 font-medium mb-2"
@@ -100,12 +110,12 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
-                    placeholder="John Doe"
+                    placeholder="Write your full name"
                     required
                   />
                 </div>
 
-                <div className="form-group">
+                <div>
                   <label
                     htmlFor="email"
                     className="block text-gray-700 font-medium mb-2"
@@ -119,13 +129,12 @@ const Contact = () => {
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
-                    placeholder="you@example.com"
+                    placeholder="Your email address"
                     required
                   />
                 </div>
               </div>
-
-              <div className="form-group">
+              <div>
                 <label
                   htmlFor="subject"
                   className="block text-gray-700 font-medium mb-2"
@@ -143,7 +152,7 @@ const Contact = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div>
                 <label
                   htmlFor="message"
                   className="block text-gray-700 font-medium mb-2"
@@ -161,6 +170,7 @@ const Contact = () => {
                   required
                 ></textarea>
               </div>
+
               <div className="pt-4">
                 <button
                   type="submit"
