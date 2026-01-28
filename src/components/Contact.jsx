@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-
+import { useTranslation } from "react-i18next";
 const Contact = () => {
+const { t, i18n } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -69,10 +70,11 @@ const Contact = () => {
           }}
         ></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Get In Touch</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            {t("contactTitle")}
+          </h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            We'd love to hear from you! Send us a message and we'll respond as
-            soon as possible.
+            {t("contactSubtitle")}
           </p>
         </div>
       </div>
@@ -83,16 +85,14 @@ const Contact = () => {
           <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 md:p-10">
             {isSubmitted && (
               <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded">
-                <p className="font-medium">Thank you for your feedback!</p>
-                <p>
-                  We've received your message and will get back to you soon.
-                </p>
+                <p className="font-medium">{t("successTitle")}</p>
+                <p>{t("successMessage")}</p>
               </div>
             )}
 
             {error && (
               <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-8 rounded">
-                <p className="font-medium">Error</p>
+                <p className="font-medium">{t("errorTitle")}</p>
                 <p>{error}</p>
               </div>
             )}
@@ -104,7 +104,7 @@ const Contact = () => {
                     htmlFor="name"
                     className="block text-gray-700 font-medium mb-2"
                   >
-                    Your Name <span className="text-red-500">*</span>
+                    {t("nameLabel")} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -113,7 +113,7 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
-                    placeholder="Write your full name"
+                    placeholder={t("namePlaceholder")}
                     required
                   />
                 </div>
@@ -123,7 +123,8 @@ const Contact = () => {
                     htmlFor="email"
                     className="block text-gray-700 font-medium mb-2"
                   >
-                    Email Address <span className="text-red-500">*</span>
+                    {t("emailLabel")}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -132,7 +133,7 @@ const Contact = () => {
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
-                    placeholder="Your email address"
+                    placeholder={t("emailPlaceholder")}
                     required
                   />
                 </div>
@@ -142,7 +143,7 @@ const Contact = () => {
                   htmlFor="subject"
                   className="block text-gray-700 font-medium mb-2"
                 >
-                  Subject
+                  {t("subjectLabel")}
                 </label>
                 <input
                   type="text"
@@ -151,7 +152,7 @@ const Contact = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
-                  placeholder="How can we help?"
+                  placeholder={t("subjectPlaceholder")}
                 />
               </div>
 
@@ -160,7 +161,7 @@ const Contact = () => {
                   htmlFor="message"
                   className="block text-gray-700 font-medium mb-2"
                 >
-                  Your Message <span className="text-red-500">*</span>
+                  {t("messageLabel")} <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="message"
@@ -169,7 +170,7 @@ const Contact = () => {
                   value={formData.message}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
-                  placeholder="Tell us more about your inquiry..."
+                  placeholder={t("messagePlaceholder")}
                   required
                 ></textarea>
               </div>
@@ -204,10 +205,10 @@ const Contact = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Sending...
+                      {t("sending")}
                     </span>
                   ) : (
-                    "Send Message"
+                    t("sendMessage")
                   )}
                 </button>
               </div>

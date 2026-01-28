@@ -1,6 +1,7 @@
 // App.js
 import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Hero from "./components/Hero";
 import About from "./components/About";
 import Services from "./components/Services";
@@ -8,6 +9,7 @@ import Announcements from "./components/Announcements";
 import Leaders from "./components/Leaders";
 import Contact from "./components/Contact";
 import DownloadForms from "./components/DownloadForms";
+import Login from "./components/Login";
 import Footer from "./components/Footer";
 import Divider from "./components/Divider";
 
@@ -24,6 +26,22 @@ const App = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const { t, i18n } = useTranslation();
+  const LanguageSwitcher = ({ className }) => (
+    <select
+      onChange={(e) => i18n.changeLanguage(e.target.value)}
+      value={i18n.language}
+      className={`bg-transparent border border-white text-white px-2 py-1 rounded ${className}`}
+    >
+      <option className="text-black" value="en">
+        {t("english")}
+      </option>
+      <option className="text-black" value="am">
+        {t("amharic")}
+      </option>
+    </select>
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -33,7 +51,7 @@ const App = () => {
         }`}
       >
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
               <img
                 src="/logo.jpg"
@@ -42,7 +60,8 @@ const App = () => {
               />
             </Link>
             {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-1">
+            <div className="flex-1"></div>
+            <div className="hidden md:flex space-x-1 gap-2">
               <Link
                 to="/"
                 className={`px-4 py-2 font-medium ${
@@ -51,7 +70,7 @@ const App = () => {
                     : "text-white hover:text-blue-200"
                 }`}
               >
-                Home
+                {t("home")}
               </Link>
               <Link
                 to="/about"
@@ -61,7 +80,7 @@ const App = () => {
                     : "text-white hover:text-blue-200"
                 }`}
               >
-                About Us
+                {t("about")}
               </Link>
               <Link
                 to="/announcements"
@@ -71,7 +90,7 @@ const App = () => {
                     : "text-white hover:text-blue-200"
                 }`}
               >
-                Announcements
+                {t("announcements")}
               </Link>
               <Link
                 to="/services"
@@ -81,7 +100,7 @@ const App = () => {
                     : "text-white hover:text-blue-200"
                 }`}
               >
-                Services
+                {t("services")}
               </Link>
               <Link
                 to="/contact"
@@ -91,7 +110,7 @@ const App = () => {
                     : "text-white hover:text-blue-200"
                 }`}
               >
-                Contact
+                {t("contact")}
               </Link>
               <Link
                 to="/download-forms"
@@ -101,8 +120,31 @@ const App = () => {
                     : "text-white hover:text-blue-200"
                 }`}
               >
-                Download Forms
+                {t("downloadForms")}
               </Link>
+            </div>
+            {/* Desktop */}
+            <div className="hidden md:flex items-center gap-6 ml-12">
+              <Link
+                to="/login"
+                className={`
+      px-5 py-2 rounded-full text-white font-semibold transition-all duration-300
+      border-2
+      ${
+        isScrolled
+          ? "border-white text-white hover:bg-white hover:text-[#1e3a5f]"
+          : "border-[#1e3a5f] text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white"
+      }
+    `}
+              >
+                {t("login")}
+              </Link>
+              <LanguageSwitcher />
+            </div>
+
+            {/* Mobile */}
+            <div className="md:hidden mr-2 text-sm">
+              <LanguageSwitcher className="text-sm" />
             </div>
 
             {/* Mobile menu button */}
@@ -134,7 +176,6 @@ const App = () => {
           </div>
 
           {/* Mobile menu */}
-          {/* Mobile menu */}
           <div
             ref={mobileMenuRef}
             className={`md:hidden fixed top-16 right-0 left-0 bg-[#1e3a5f] rounded-lg mx-4 py-4 transform transition-all duration-300 ease-in-out shadow-xl border border-white/20 ${
@@ -144,26 +185,26 @@ const App = () => {
             }`}
           >
             {[
-              { name: "Home", path: "/" },
-              { name: "About Us", path: "/about" },
-              { name: "Announcements", path: "/announcements" },
-              { name: "Services", path: "/services" },
-              { name: "Contact", path: "/contact" },
-              { name: "Download Forms", path: "/download-forms" },
+              { key: "home", path: "/" },
+              { key: "about", path: "/about" },
+              { key: "announcements", path: "/announcements" },
+              { key: "services", path: "/services" },
+              { key: "contact", path: "/contact" },
+              { key: "downloadForms", path: "/download-forms" },
+              { key: "login", path: "/login" },
             ].map((link) => (
               <Link
-                key={link.name}
+                key={link.key}
                 to={link.path}
                 className="block px-6 py-3 text-white rounded hover:bg-white/20 transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
-                {link.name}
+                {t(link.key)}
               </Link>
             ))}
           </div>
         </div>
       </header>
-
       {/* Main Content */}
       <main className="flex-grow">
         <Routes>
@@ -184,12 +225,11 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route path="/announcements" element={<Announcements />} />
           <Route path="/download-forms" element={<DownloadForms />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
-          {/* Add Routes if needed  */}
         </Routes>
       </main>
-
       {/* Footer */}
       <Footer />
     </div>

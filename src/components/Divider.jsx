@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from "react-i18next";
 
 const Divider = () => {
+  const { t, i18n } = useTranslation();
   return (
     <div className="relative py-16 bg-white">
       <div className="absolute inset-0 flex items-center justify-center">
@@ -8,7 +10,7 @@ const Divider = () => {
       </div>
       <div className="relative flex justify-center">
         <span className="px-4 bg-white text-gray-500 text-lg font-medium">
-          Latest Updates
+          {t('news')}
         </span>
       </div>
     </div>

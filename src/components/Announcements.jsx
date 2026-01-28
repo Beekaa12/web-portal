@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import { useTranslation } from "react-i18next";
 const Announcements = () => {
+  const { t, i18n } = useTranslation();
   const [announcements, setAnnouncements] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6); 
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
@@ -104,10 +105,11 @@ const Announcements = () => {
           }}
         ></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Announcements</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            {t("announcementsTitle")}
+          </h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Stay updated with the latest news and important updates from our
-            SACCO
+            {t("announcementsSubtitle")}
           </p>
         </div>
       </div>
@@ -132,7 +134,7 @@ const Announcements = () => {
                   <div className="flex justify-between items-center mb-3">
                     <span
                       className={`text-xs font-semibold px-3 py-1 rounded-full ${getCategoryColor(
-                        announcement.category
+                        announcement.category,
                       )}`}
                     >
                       {announcement.category}
@@ -151,7 +153,7 @@ const Announcements = () => {
                     onClick={() => openModal(announcement)}
                     className="mt-auto inline-flex items-center text-blue-600 hover:text-blue-800 font-medium group transition-colors"
                   >
-                    Read Full Announcement
+                    {t("readFull")}
                     <svg
                       className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1"
                       fill="none"
@@ -178,7 +180,7 @@ const Announcements = () => {
                 onClick={handleSeeMore}
                 className="px-6 py-3 text-[#1e3a5f] font-extrabold hover:underline transition-all rounded-lg border border-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white"
               >
-                See More
+                {t("seeMore")}
               </button>
             </div>
           )}
@@ -223,7 +225,7 @@ const Announcements = () => {
                 <div className="flex flex-wrap justify-between items-center mb-4">
                   <span
                     className={`text-sm font-semibold px-3 py-1 rounded-full ${getCategoryColor(
-                      selectedAnnouncement.category
+                      selectedAnnouncement.category,
                     )}`}
                   >
                     {selectedAnnouncement.category}
@@ -243,19 +245,19 @@ const Announcements = () => {
                 />
                 <div className="mt-8 pt-6 border-t border-gray-200">
                   <p className="text-sm text-gray-500">
-                    For more information, please contact our customer care at{" "}
+                    {t("contactInfo")}{" "}
                     <a
                       href="tel:+254700000000"
                       className="text-blue-600 hover:underline"
                     >
-                      +254 700 000000
+                      +251 910 000 00
                     </a>{" "}
-                    or email{" "}
+                    {t("orEmail")}{" "}
                     <a
-                      href="mailto:info@sacco.co.ke"
+                      href="mailto:sacco@inu.edu.et"
                       className="text-blue-600 hover:underline"
                     >
-                      info@sacco.co.ke
+                      sacco@inu.edu.et
                     </a>
                   </p>
                 </div>

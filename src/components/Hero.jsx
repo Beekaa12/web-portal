@@ -1,6 +1,7 @@
 import React from 'react';
-
+import { useTranslation } from "react-i18next";
 const Hero = () => {
+  const { t, i18n } = useTranslation();
   const heroStyle = {
     backgroundImage: "url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
     backgroundSize: 'cover',
@@ -36,16 +37,18 @@ const Hero = () => {
     <section style={heroStyle}>
       <div style={overlayStyle}></div>
       <div style={contentStyle}>
-        <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Our Union</h1>
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          {t("heroTitle")}
+        </h1>
         <p className="text-xl md:text-2xl mb-8 text-blue-100">
-          Empowering members through financial growth and community support
+          {t("heroSubtitle")}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <button className="bg-white text-[#1e3a5f] px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition text-lg">
-            Join Now
+            {t("heroJoin")}
           </button>
           <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:bg-opacity-10 transition text-lg">
-            Learn More
+            {t("heroLearn")}
           </button>
         </div>
       </div>

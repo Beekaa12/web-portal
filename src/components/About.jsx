@@ -1,6 +1,7 @@
 import React from 'react';
-
+import { useTranslation } from "react-i18next";
 const About = () => {
+  const { t, i18n } = useTranslation();
   return (
     <div className="bg-gradient-to-b from-blue-50 to-white">
       {/* Hero Section */}
@@ -16,11 +17,10 @@ const About = () => {
         ></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            About Us
+            {t("aboutUsTitle")}
           </h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Empowering our community through financial inclusion, trust, and
-            sustainable growth since 2010
+            {t("aboutUsSubtitle")}
           </p>
         </div>
       </div>
