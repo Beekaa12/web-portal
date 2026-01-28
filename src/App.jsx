@@ -31,7 +31,7 @@ const App = () => {
     <select
       onChange={(e) => i18n.changeLanguage(e.target.value)}
       value={i18n.language}
-      className={`bg-transparent border border-white text-white px-2 py-1 rounded ${className}`}
+      className={`bg-transparent text-white px-1 py-1 rounded hover:border hover:bg-[#06575d] ${className}`}
     >
       <option className="text-black" value="en">
         {t("english")}
@@ -124,22 +124,20 @@ const App = () => {
               </Link>
             </div>
             {/* Desktop */}
-            <div className="hidden md:flex items-center gap-6 ml-12">
+            <div className="hidden md:flex items-center gap-6 ml-14 mr-10">
+              <LanguageSwitcher />
               <Link
                 to="/login"
-                className={`
-      px-5 py-2 rounded-full text-white font-semibold transition-all duration-300
-      border-2
-      ${
-        isScrolled
-          ? "border-white text-white hover:bg-white hover:text-[#1e3a5f]"
-          : "border-[#1e3a5f] text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white"
-      }
-    `}
+                className={`px-5 py-1 rounded text-white font-semibold transition-all duration-300 border-2 
+                  ${
+                    isScrolled
+                      ? "border-white text-white text-lg hover:bg-[#f2f6fb] hover:text-[#1e3a5f]"
+                      : "border-[#1e3a5f] text-lg text-[#1e3a5f] hover:bg-[#224675] hover:text-white"
+                  }
+                `}
               >
                 {t("login")}
               </Link>
-              <LanguageSwitcher />
             </div>
 
             {/* Mobile */}
