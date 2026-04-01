@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -224,9 +225,12 @@ const Footer = () => {
             </p>
             <div>
               <span className="text-blue-100 text-sm">Developed by </span>
-              <a href="" className="text-blue-300 hover:text-white text-sm">
+              <Link
+                to="/groupmember"
+                className="text-blue-300 hover:text-white text-sm"
+              >
                 SE Students 2026 | Group 5
-              </a>
+              </Link>
             </div>
             <div className="flex space-x-6">
               <a href="#" className="text-blue-100 hover:text-white text-sm">

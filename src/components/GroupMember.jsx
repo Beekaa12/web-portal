@@ -1,0 +1,266 @@
+import React from "react";
+import {
+  FaPhoneAlt,
+  FaEnvelope,
+  FaUserTie,
+  FaLinkedin,
+  FaGlobe,
+} from "react-icons/fa";
+
+const members = [
+  {
+    id: 1,
+    name: "Abel Tadesse",
+    role: "Frontend Developer",
+    about: "Builds responsive interfaces and keeps the user journey smooth.",
+    email: "abel.tadesse@iu.edu.et",
+    phone: "+251 911 223 344",
+    linkedin: "https://www.linkedin.com",
+    portfolio: "https://abel-portfolio.dev",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: 2,
+    name: "Sara Mekonnen",
+    role: "Backend Developer",
+    about: "Designs secure APIs and reliable backend services.",
+    email: "sara.mekonnen@iu.edu.et",
+    phone: "+251 922 334 455",
+    linkedin: "https://www.linkedin.com",
+    portfolio: "https://sara-portfolio.dev",
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: 3,
+    name: "Dawit Alemu",
+    role: "UI/UX Designer",
+    about: "Creates intuitive visual systems and clean product experiences.",
+    email: "dawit.alemu@iu.edu.et",
+    phone: "+251 933 445 566",
+    linkedin: "https://www.linkedin.com",
+    portfolio: "https://dawit-portfolio.dev",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: 4,
+    name: "Meron Desta",
+    role: "QA Engineer",
+    about: "Ensures quality through test coverage and proactive validation.",
+    email: "meron.desta@iu.edu.et",
+    phone: "+251 944 556 677",
+    linkedin: "https://www.linkedin.com",
+    portfolio: "https://meron-portfolio.dev",
+    image:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: 5,
+    name: "Henok Fekadu",
+    role: "Project Coordinator",
+    about: "Coordinates planning, communication, and on-time execution.",
+    email: "henok.fekadu@iu.edu.et",
+    phone: "+251 955 667 788",
+    linkedin: "https://www.linkedin.com",
+    portfolio: "https://henok-portfolio.dev",
+    image:
+      "https://images.unsplash.com/photo-1696505523865-84c7c9372901?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+];
+
+const GroupMember = () => {
+  return (
+    <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen">
+      <section className="relative bg-[#1e3a5f] text-white py-20">
+        <div
+          className="absolute inset-0 opacity-25"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2000&q=80')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></div>
+
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Group Members</h1>
+          <p className="text-blue-100 text-lg md:text-xl max-w-3xl mx-auto">
+            Meet Team Group 5, the students behind the cooperative web portal
+            and digital sacco services.
+          </p>
+        </div>
+      </section>
+
+      <section className="">
+        <div className="my-6 flex flex-col md:flex-row w-full">
+          {/* LEFT SIDE */}
+          <div className="md:w-1/3 bg-white p-8 md:p-10 flex flex-col justify-center shadow-sm rounded-2xl">
+            <h2 className="text-3xl font-semibold text-gray-900 mb-4">
+              Meet The Team
+            </h2>
+
+            <p className="text-slate-500 mb-6 leading-relaxed text-[15px]">
+              Our team delivers high-quality solutions with modern tools and
+              clean design principles.
+            </p>
+
+            <ul className="space-y-4">
+              {[
+                "Free to use",
+                "Desktop + mobile versions",
+                "layout styles included",
+                "Built with Auto Layout",
+              ].map((item, i) => (
+                <li
+                  key={i}
+                  className="flex items-center gap-3 text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 hover:border-sky-200 hover:bg-sky-50/40 transition"
+                >
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-sm font-bold">
+                    ✓
+                  </span>
+                  <span className="text-[15px]">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* RIGHT SIDE */}
+          <div className="md:w-2/3 p-8 md:p-10">
+            <div className="mb-10 items-center text-center">
+              <h3 className="text-3xl font-semibold text-gray-900 mb-3">
+                The People Behind the Work
+              </h3>
+              <p className="text-gray-500 text-xl text-[15px]">
+                We believe in collaboration, clear communication, and delivering
+                results through strong teamwork.
+              </p>
+            </div>
+
+            {/* TEAM GRID (2 COL) */}
+            <div className="grid md:grid-cols-2 gap-6 mt-10">
+              {members.map((member) => (
+                <div
+                  key={member.id}
+                  className="group flex flex-col sm:flex-row bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm p-2 hover:-translate-y-1 hover:shadow-lg hover:border-sky-200 transition-all duration-300"
+                >
+                  <div className="w-full sm:w-32 flex-shrink-0 flex flex-col">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-44 sm:w-32 sm:h-32 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="mt-2 flex items-center justify-center gap-2">
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="LinkedIn account"
+                        className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+                        aria-label={`${member.name} LinkedIn`}
+                      >
+                        <FaLinkedin className="text-[12px]" />
+                      </a>
+                      <a
+                        href={member.portfolio}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Go to portfolio"
+                        className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+                        aria-label={`${member.name} Portfolio`}
+                      >
+                        <FaGlobe className="text-[12px]" />
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* RIGHT: CONTENT */}
+                  <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
+                    {/* TOP INFO */}
+                    <div>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 mb-2">
+                        <h4 className="sm:flex-1 text-lg font-bold text-gray-800 truncate">
+                          {member.name}
+                        </h4>
+
+                        <span className="flex items-center gap-1 text-sm font-medium text-blue-600 capitalize whitespace-nowrap">
+                          <FaUserTie className="text-xs" />
+                          {member.role}
+                        </span>
+                      </div>
+
+                      <p
+                        className="text-[13px] text-slate-600 mb-2 leading-relaxed"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {member.about}
+                      </p>
+
+                      <div className="space-y-1.5 pt-1">
+                        <div className="flex items-center gap-2 text-[12px] text-slate-600">
+                          <FaPhoneAlt className="text-[11px] text-blue-500" />
+                          <span>{member.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[12px] text-slate-600 min-w-0">
+                          <FaEnvelope className="text-[11px] text-blue-500" />
+                          <span className="truncate">{member.email}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CONTACT INFO
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                      <p className="text-[12px] text-slate-500 truncate">{member.email}</p>
+
+                      <div className="flex items-center gap-1.5 text-slate-500">
+                        <a
+                          href={member.linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+                          aria-label={`${member.name} LinkedIn`}
+                        >
+                          <FaLinkedin className="text-[12px]" />
+                        </a>
+                        <a
+                          href={member.portfolio}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+                          aria-label={`${member.name} Portfolio`}
+                        >
+                          <FaGlobe className="text-[12px]" />
+                        </a>
+                        <a
+                          href={`mailto:${member.email}`}
+                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+                          aria-label={`Email ${member.name}`}
+                        >
+                          <FaEnvelope className="text-[11px]" />
+                        </a>
+                        <a
+                          href={`tel:${member.phone}`}
+                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+                          aria-label={`Call ${member.name}`}
+                        >
+                          <FaPhoneAlt className="text-[11px]" />
+                        </a>
+                      </div>
+                    </div> */}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default GroupMember;

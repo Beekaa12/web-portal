@@ -12,6 +12,7 @@ import DownloadForms from "./components/DownloadForms";
 import Login from "./components/Login";
 import Footer from "./components/Footer";
 import Divider from "./components/Divider";
+import GroupMember from "./components/GroupMember";
 
 const App = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -226,6 +227,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/groupmember" element={<GroupMember />} />
         </Routes>
       </main>
       {/* Footer */}
