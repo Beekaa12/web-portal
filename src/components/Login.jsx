@@ -70,11 +70,6 @@ const Login = () => {
             <p className="text-center text-gray-500 mb-6">
               Please sign in to continue
             </p>
-            <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-              <p className="font-semibold">Mock Login</p>
-              <p>Email: member@sacco.com</p>
-              <p>Password: 12345678</p>
-            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
