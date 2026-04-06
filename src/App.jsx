@@ -13,6 +13,7 @@ import Login from "./components/Login";
 import Footer from "./components/Footer";
 import Divider from "./components/Divider";
 import GroupMember from "./components/GroupMember";
+import MemberDashboard from "./pages/MemberDashboard";
 
 const App = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -228,6 +229,7 @@ const App = () => {
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/groupmember" element={<GroupMember />} />
+          <Route path="/member-dashboard" element={<MemberDashboard />} />
         </Routes>
       </main>
       {/* Footer */}

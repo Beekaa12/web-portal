@@ -10,34 +10,33 @@ import {
 const members = [
   {
     id: 1,
-    name: "Abel Tadesse",
-    role: "Frontend Developer",
+    name: "Tucho Biratu",
+    role: "Full Stack Developer",
     about: "Builds responsive interfaces and keeps the user journey smooth.",
-    email: "abel.tadesse@iu.edu.et",
+    email: "Tucho.Biratu@iu.edu.et",
     phone: "+251 911 223 344",
-    linkedin: "https://www.linkedin.com",
-    portfolio: "https://abel-portfolio.dev",
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=80",
+    linkedin: "https://www.linkedin.com/in/tucho12",
+    portfolio: "https://tucho-biratu.vercel.app/",
+    image: "https://tucho-biratu.vercel.app/Tucho.png",
   },
   {
     id: 2,
-    name: "Sara Mekonnen",
-    role: "Backend Developer",
+    name: "Jiregna Worku",
+    role: "Full Stack Developer",
     about: "Designs secure APIs and reliable backend services.",
-    email: "sara.mekonnen@iu.edu.et",
+    email: "jiregna.worku@iu.edu.et",
     phone: "+251 922 334 455",
-    linkedin: "https://www.linkedin.com",
-    portfolio: "https://sara-portfolio.dev",
+    linkedin: "https://www.linkedin.com/in/jiregna-worku",
+    portfolio: "https://jiregnaworku.vercel.app/",
     image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80",
+      "https://media.licdn.com/dms/image/v2/D4D03AQEiLD10LLqcnA/profile-displayphoto-shrink_200_200/B4DZW3jmbgHIAY-/0/1742541318878?e=2147483647&v=beta&t=K_2sXKufd_aL0u4KS65LcCn5cZhf_OeFHILJ9Ew-drw",
   },
   {
     id: 3,
-    name: "Dawit Alemu",
+    name: "Amanuel Sisay",
     role: "UI/UX Designer",
     about: "Creates intuitive visual systems and clean product experiences.",
-    email: "dawit.alemu@iu.edu.et",
+    email: "amanuel.sisay@iu.edu.et",
     phone: "+251 933 445 566",
     linkedin: "https://www.linkedin.com",
     portfolio: "https://dawit-portfolio.dev",
@@ -46,10 +45,10 @@ const members = [
   },
   {
     id: 4,
-    name: "Meron Desta",
+    name: "Ahmed Kassaye",
     role: "QA Engineer",
     about: "Ensures quality through test coverage and proactive validation.",
-    email: "meron.desta@iu.edu.et",
+    email: "ahmed.kassaye@iu.edu.et",
     phone: "+251 944 556 677",
     linkedin: "https://www.linkedin.com",
     portfolio: "https://meron-portfolio.dev",
@@ -58,10 +57,10 @@ const members = [
   },
   {
     id: 5,
-    name: "Henok Fekadu",
+    name: "Habtamu Biks",
     role: "Project Coordinator",
     about: "Coordinates planning, communication, and on-time execution.",
-    email: "henok.fekadu@iu.edu.et",
+    email: "habtamu.biks@iu.edu.et",
     phone: "+251 955 667 788",
     linkedin: "https://www.linkedin.com",
     portfolio: "https://henok-portfolio.dev",
@@ -138,7 +137,7 @@ const GroupMember = () => {
             </div>
 
             {/* TEAM GRID (2 COL) */}
-            <div className="grid md:grid-cols-2 gap-6 mt-10">
+            <div className="grid grid-cols-1 min-[1100px]:grid-cols-2 gap-6 mt-10">
               {members.map((member) => (
                 <div
                   key={member.id}
@@ -148,7 +147,7 @@ const GroupMember = () => {
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-44 sm:w-32 sm:h-32 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-72 sm:w-32 sm:h-32 object-cover object-top sm:object-contain sm:object-center bg-slate-50 rounded-[8px] scale-100 sm:scale-100 group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="mt-2 flex items-center justify-center gap-2">
                       <a
@@ -178,8 +177,8 @@ const GroupMember = () => {
                   <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
                     {/* TOP INFO */}
                     <div>
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 mb-2">
-                        <h4 className="sm:flex-1 text-lg font-bold text-gray-800 truncate">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between min-[1100px]:max-[1400px]:flex-col min-[1100px]:max-[1400px]:items-start gap-1 sm:gap-2 mb-2">
+                        <h4 className="sm:flex-1 text-lg font-bold text-gray-800">
                           {member.name}
                         </h4>
 
@@ -189,15 +188,7 @@ const GroupMember = () => {
                         </span>
                       </div>
 
-                      <p
-                        className="text-[13px] text-slate-600 mb-2 leading-relaxed"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
+                      <p className="text-[13px] text-slate-600 mb-2 leading-relaxed break-words">
                         {member.about}
                       </p>
 

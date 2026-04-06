@@ -1,19 +1,41 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const MOCK_USER = {
+  email: "member@sacco.com",
+  password: "12345678",
+};
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [loginError, setLoginError] = useState("");
 
   const handleChange = (e) => {
+    if (loginError) {
+      setLoginError("");
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    // TODO: connect backend login API
+
+    const normalizedEmail = formData.email.trim().toLowerCase();
+    const normalizedPassword = formData.password.trim();
+
+    if (
+      normalizedEmail === MOCK_USER.email &&
+      normalizedPassword === MOCK_USER.password
+    ) {
+      navigate("/member-dashboard");
+      return;
+    }
+
+    setLoginError("Invalid email or password. Please use mock credentials.");
   };
 
   return (
@@ -48,6 +70,11 @@ const Login = () => {
             <p className="text-center text-gray-500 mb-6">
               Please sign in to continue
             </p>
+            <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+              <p className="font-semibold">Mock Login</p>
+              <p>Email: member@sacco.com</p>
+              <p>Password: 12345678</p>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -86,6 +113,10 @@ const Login = () => {
               >
                 Sign In
               </button>
+
+              {loginError && (
+                <p className="text-sm text-red-600 font-medium">{loginError}</p>
+              )}
             </form>
 
             {/* Footer Note */}
