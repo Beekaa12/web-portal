@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import {
   FaPhoneAlt,
   FaEnvelope,
@@ -40,8 +40,7 @@ const members = [
     phone: "+251 933 445 566",
     linkedin: "https://www.linkedin.com",
     portfolio: "https://dawit-portfolio.dev",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80",
+    image: "https://cdn-icons-png.flaticon.com/512/9187/9187604.png",
   },
   {
     id: 4,
@@ -52,8 +51,7 @@ const members = [
     phone: "+251 944 556 677",
     linkedin: "https://www.linkedin.com",
     portfolio: "https://meron-portfolio.dev",
-    image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
+    image: "https://cdn-icons-png.flaticon.com/512/9187/9187604.png",
   },
   {
     id: 5,
@@ -64,12 +62,159 @@ const members = [
     phone: "+251 955 667 788",
     linkedin: "https://www.linkedin.com",
     portfolio: "https://henok-portfolio.dev",
-    image:
-      "https://images.unsplash.com/photo-1696505523865-84c7c9372901?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://thumbs.dreamstime.com/faces/1674243916AQ6.jpg",
   },
 ];
 
+const teamHighlights = [
+  "Free to use",
+  "Desktop + mobile versions",
+  "layout styles included",
+  "Built with Auto Layout",
+];
+
+const MemberCard = memo(function MemberCard({ member, onSelectMember }) {
+  return (
+    <div className="group flex flex-col sm:flex-row bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm p-2 hover:-translate-y-1 hover:shadow-lg hover:border-sky-200 transition-all duration-300">
+      <div className="w-full sm:w-32 flex-shrink-0 flex flex-col">
+        <button
+          type="button"
+          onClick={() => onSelectMember(member)}
+          className="rounded-[8px] overflow-hidden focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-zoom-in"
+          aria-label={`View full photo of ${member.name}`}
+        >
+          <img
+            src={member.image}
+            alt={member.name}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-72 sm:w-32 sm:h-32 object-cover object-top sm:object-contain sm:object-center bg-slate-50 scale-100 sm:scale-100 group-hover:scale-105 transition-transform duration-300"
+          />
+        </button>
+        <div className="mt-2 flex items-center justify-center gap-2">
+          <a
+            href={member.linkedin}
+            target="_blank"
+            rel="noreferrer"
+            title="LinkedIn account"
+            className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+            aria-label={`${member.name} LinkedIn`}
+          >
+            <FaLinkedin className="text-[12px]" />
+          </a>
+          <a
+            href={member.portfolio}
+            target="_blank"
+            rel="noreferrer"
+            title="Go to portfolio"
+            className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
+            aria-label={`${member.name} Portfolio`}
+          >
+            <FaGlobe className="text-[12px]" />
+          </a>
+        </div>
+      </div>
+
+      <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
+        <div>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between min-[1100px]:max-[1400px]:flex-col min-[1100px]:max-[1400px]:items-start gap-1 sm:gap-2 mb-2">
+            <h4 className="sm:flex-1 text-lg font-bold text-gray-800">
+              {member.name}
+            </h4>
+
+            <span className="flex items-center gap-1 text-sm font-medium text-blue-600 capitalize whitespace-nowrap">
+              <FaUserTie className="text-xs" />
+              {member.role}
+            </span>
+          </div>
+
+          <p className="text-[13px] text-slate-600 mb-2 leading-relaxed break-words">
+            {member.about}
+          </p>
+
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center gap-2 text-[12px] text-slate-600">
+              <FaPhoneAlt className="text-[11px] text-blue-500" />
+              <span>{member.phone}</span>
+            </div>
+            <div className="flex items-center gap-2 text-[12px] text-slate-600 min-w-0">
+              <FaEnvelope className="text-[11px] text-blue-500" />
+              <span className="truncate">{member.email}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+const MemberPhotoModal = memo(function MemberPhotoModal({
+  selectedMember,
+  onClose,
+}) {
+  if (!selectedMember) {
+    return null;
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Member photo modal for ${selectedMember.name}`}
+    >
+      <div
+        className="relative inline-flex max-w-full max-h-[92vh]"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="absolute top-2 right-2 text-black text-3xl leading-none px-2"
+          onClick={onClose}
+          aria-label="Close photo modal"
+        >
+          ×
+        </button>
+
+        <img
+          src={selectedMember.image}
+          alt={selectedMember.name}
+          decoding="async"
+          className="max-w-full max-h-[92vh] object-contain"
+        />
+      </div>
+    </div>
+  );
+});
+
 const GroupMember = () => {
+  const [selectedMember, setSelectedMember] = useState(null);
+  const openMemberModal = useCallback((member) => {
+    setSelectedMember(member);
+  }, []);
+  const closeMemberModal = useCallback(() => {
+    setSelectedMember(null);
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        closeMemberModal();
+      }
+    };
+
+    if (selectedMember) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [selectedMember, closeMemberModal]);
+
   return (
     <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen">
       <section className="relative bg-[#1e3a5f] text-white py-20">
@@ -106,12 +251,7 @@ const GroupMember = () => {
             </p>
 
             <ul className="space-y-4">
-              {[
-                "Free to use",
-                "Desktop + mobile versions",
-                "layout styles included",
-                "Built with Auto Layout",
-              ].map((item, i) => (
+              {teamHighlights.map((item, i) => (
                 <li
                   key={i}
                   className="flex items-center gap-3 text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 hover:border-sky-200 hover:bg-sky-50/40 transition"
@@ -139,117 +279,21 @@ const GroupMember = () => {
             {/* TEAM GRID (2 COL) */}
             <div className="grid grid-cols-1 min-[1100px]:grid-cols-2 gap-6 mt-10">
               {members.map((member) => (
-                <div
+                <MemberCard
                   key={member.id}
-                  className="group flex flex-col sm:flex-row bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm p-2 hover:-translate-y-1 hover:shadow-lg hover:border-sky-200 transition-all duration-300"
-                >
-                  <div className="w-full sm:w-32 flex-shrink-0 flex flex-col">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-72 sm:w-32 sm:h-32 object-cover object-top sm:object-contain sm:object-center bg-slate-50 rounded-[8px] scale-100 sm:scale-100 group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="mt-2 flex items-center justify-center gap-2">
-                      <a
-                        href={member.linkedin}
-                        target="_blank"
-                        rel="noreferrer"
-                        title="LinkedIn account"
-                        className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
-                        aria-label={`${member.name} LinkedIn`}
-                      >
-                        <FaLinkedin className="text-[12px]" />
-                      </a>
-                      <a
-                        href={member.portfolio}
-                        target="_blank"
-                        rel="noreferrer"
-                        title="Go to portfolio"
-                        className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
-                        aria-label={`${member.name} Portfolio`}
-                      >
-                        <FaGlobe className="text-[12px]" />
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* RIGHT: CONTENT */}
-                  <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
-                    {/* TOP INFO */}
-                    <div>
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between min-[1100px]:max-[1400px]:flex-col min-[1100px]:max-[1400px]:items-start gap-1 sm:gap-2 mb-2">
-                        <h4 className="sm:flex-1 text-lg font-bold text-gray-800">
-                          {member.name}
-                        </h4>
-
-                        <span className="flex items-center gap-1 text-sm font-medium text-blue-600 capitalize whitespace-nowrap">
-                          <FaUserTie className="text-xs" />
-                          {member.role}
-                        </span>
-                      </div>
-
-                      <p className="text-[13px] text-slate-600 mb-2 leading-relaxed break-words">
-                        {member.about}
-                      </p>
-
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex items-center gap-2 text-[12px] text-slate-600">
-                          <FaPhoneAlt className="text-[11px] text-blue-500" />
-                          <span>{member.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-[12px] text-slate-600 min-w-0">
-                          <FaEnvelope className="text-[11px] text-blue-500" />
-                          <span className="truncate">{member.email}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CONTACT INFO
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
-                      <p className="text-[12px] text-slate-500 truncate">{member.email}</p>
-
-                      <div className="flex items-center gap-1.5 text-slate-500">
-                        <a
-                          href={member.linkedin}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
-                          aria-label={`${member.name} LinkedIn`}
-                        >
-                          <FaLinkedin className="text-[12px]" />
-                        </a>
-                        <a
-                          href={member.portfolio}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
-                          aria-label={`${member.name} Portfolio`}
-                        >
-                          <FaGlobe className="text-[12px]" />
-                        </a>
-                        <a
-                          href={`mailto:${member.email}`}
-                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
-                          aria-label={`Email ${member.name}`}
-                        >
-                          <FaEnvelope className="text-[11px]" />
-                        </a>
-                        <a
-                          href={`tel:${member.phone}`}
-                          className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 transition"
-                          aria-label={`Call ${member.name}`}
-                        >
-                          <FaPhoneAlt className="text-[11px]" />
-                        </a>
-                      </div>
-                    </div> */}
-                  </div>
-                </div>
+                  member={member}
+                  onSelectMember={openMemberModal}
+                />
               ))}
             </div>
           </div>
         </div>
       </section>
+
+      <MemberPhotoModal
+        selectedMember={selectedMember}
+        onClose={closeMemberModal}
+      />
     </div>
   );
 };
