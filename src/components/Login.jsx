@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const MOCK_USER = {
-  email: "member@sacco.com",
-  password: "12345678",
-};
+const API_BASE = (
+  import.meta.env.VITE_API_URL || "http://localhost:5000"
+).replace(/\/+$/, "");
 
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
   const [loginError, setLoginError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     if (loginError) {
@@ -21,21 +21,54 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const normalizedEmail = formData.email.trim().toLowerCase();
-    const normalizedPassword = formData.password.trim();
+    setIsLoading(true);
+    setLoginError("");
 
-    if (
-      normalizedEmail === MOCK_USER.email &&
-      normalizedPassword === MOCK_USER.password
-    ) {
-      navigate("/member-dashboard");
-      return;
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/member/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          identifier: formData.identifier,
+          password: formData.password,
+        }),
+      });
+
+      const contentType = res.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await res.json()
+        : null;
+
+      if (!res.ok) {
+        setLoginError(
+          data?.message || "Invalid Employee ID/email or password.",
+        );
+        return;
+      }
+
+      if (!data?.token) {
+        setLoginError("Login failed: token missing in response.");
+        return;
+      }
+
+      localStorage.setItem("member_token", data.token);
+      localStorage.setItem("member_profile", JSON.stringify(data.member || {}));
+
+      if (data?.member?.must_change_password) {
+        navigate("/member-settings");
+      } else {
+        navigate("/member-dashboard");
+      }
+    } catch (error) {
+      console.error("Member login error:", error);
+      setLoginError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setLoginError("Invalid email or password. Please use mock credentials.");
   };
 
   return (
@@ -74,16 +107,16 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address
+                  Employee ID or Email
                 </label>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="identifier"
+                  value={formData.identifier}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
-                  placeholder="you@example.com"
+                  placeholder="Enter employee ID or email"
                 />
               </div>
 
@@ -104,9 +137,10 @@ const Login = () => {
 
               <button
                 type="submit"
+                disabled={isLoading}
                 className="w-full flex items-center justify-center px-6 py-3 bg-[#1e3a5f] text-white font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] focus:ring-offset-2 transition"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </button>
 
               {loginError && (

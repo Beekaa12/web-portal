@@ -1,6 +1,13 @@
 // App.js
 import React, { useState, useEffect, useRef } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -15,10 +22,60 @@ import Divider from "./components/Divider";
 import GroupMember from "./components/GroupMember";
 import MemberDashboard from "./pages/MemberDashboard";
 
+const getStoredMemberSession = () => {
+  const token = localStorage.getItem("member_token");
+  let profile = null;
+
+  try {
+    profile = JSON.parse(localStorage.getItem("member_profile") || "null");
+  } catch {
+    profile = null;
+  }
+
+  return { token, profile };
+};
+
+const ProtectedMemberRoute = ({ children, allowWhenMustChange = false }) => {
+  const memberToken = localStorage.getItem("member_token");
+  let memberProfile = null;
+
+  try {
+    memberProfile = JSON.parse(
+      localStorage.getItem("member_profile") || "null",
+    );
+  } catch {
+    memberProfile = null;
+  }
+
+  if (!memberToken) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (memberProfile?.must_change_password && !allowWhenMustChange) {
+    return <Navigate to="/member-dashboard?tab=settings" replace />;
+  }
+
+  return children;
+};
+
 const App = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [memberSession, setMemberSession] = useState(getStoredMemberSession);
   const mobileMenuRef = useRef(null);
+  const profileMenuRef = useRef(null);
+
+  const memberToken = memberSession.token;
+  const memberProfile = memberSession.profile;
+  const isMemberAuthenticated = Boolean(memberToken);
+  const memberDisplayName = memberProfile?.full_name || "Member";
+  const memberAvatarUrl =
+    memberProfile?.profile_image ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(memberDisplayName)}&background=1e3a5f&color=ffffff`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,6 +84,57 @@ const App = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    setMemberSession(getStoredMemberSession());
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const handleStorageChange = () =>
+      setMemberSession(getStoredMemberSession());
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target)
+      ) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const activeTab = new URLSearchParams(location.search).get("tab");
+    const isSettingsView =
+      location.pathname === "/member-settings" ||
+      (location.pathname === "/member-dashboard" && activeTab === "settings");
+
+    // Read latest storage so same-tab updates after password change are respected.
+    const latestSession = getStoredMemberSession();
+    const mustChangePassword = Boolean(
+      latestSession.token && latestSession.profile?.must_change_password,
+    );
+
+    if (mustChangePassword && !isSettingsView) {
+      navigate("/member-dashboard?tab=settings", { replace: true });
+    }
+  }, [location.pathname, location.search, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("member_token");
+    localStorage.removeItem("member_profile");
+    setMemberSession({ token: null, profile: null });
+    setIsProfileMenuOpen(false);
+    setIsMenuOpen(false);
+    navigate("/login", { replace: true });
+  };
 
   const { t, i18n } = useTranslation();
   const LanguageSwitcher = ({ className }) => (
@@ -128,18 +236,71 @@ const App = () => {
             {/* Desktop */}
             <div className="hidden md:flex items-center gap-6 ml-14 mr-10">
               <LanguageSwitcher />
-              <Link
-                to="/login"
-                className={`px-5 py-1 rounded text-white font-semibold transition-all duration-300 border-2 
+              {isMemberAuthenticated ? (
+                <div className="relative" ref={profileMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                    className="group flex items-center gap-2"
+                    title={memberDisplayName}
+                  >
+                    <img
+                      src={memberAvatarUrl}
+                      alt={memberDisplayName}
+                      className="h-11 w-11 rounded-full object-cover border-2 border-white shadow"
+                    />
+                    <span className="max-w-[170px] truncate text-sm font-semibold text-white">
+                      {memberDisplayName}
+                    </span>
+                  </button>
+
+                  {isProfileMenuOpen && (
+                    <div className="absolute right-0 mt-3 w-44 rounded-xl border border-gray-100 bg-white shadow-xl py-2">
+                      <Link
+                        to="/member-dashboard?tab=dashboard"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        to="/member-dashboard?tab=profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/member-dashboard?tab=settings"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        Setting
+                      </Link>
+                      <button
+                        type="button"
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className={`px-5 py-1 rounded text-white font-semibold transition-all duration-300 border-2 
                   ${
                     isScrolled
                       ? "border-white text-white text-lg hover:bg-[#f2f6fb] hover:text-[#1e3a5f]"
                       : "border-[#1e3a5f] text-lg text-[#1e3a5f] hover:bg-[#224675] hover:text-white"
                   }
                 `}
-              >
-                {t("login")}
-              </Link>
+                >
+                  {t("login")}
+                </Link>
+              )}
             </div>
 
             {/* Mobile */}
@@ -191,7 +352,25 @@ const App = () => {
               { key: "services", path: "/services" },
               { key: "contact", path: "/contact" },
               { key: "downloadForms", path: "/download-forms" },
-              { key: "login", path: "/login" },
+              ...(isMemberAuthenticated
+                ? [
+                    {
+                      key: "memberProfile",
+                      path: "/member-dashboard?tab=profile",
+                      label: "Profile",
+                    },
+                    {
+                      key: "memberDashboard",
+                      path: "/member-dashboard?tab=dashboard",
+                      label: "Dashboard",
+                    },
+                    {
+                      key: "memberSettings",
+                      path: "/member-dashboard?tab=settings",
+                      label: "Setting",
+                    },
+                  ]
+                : [{ key: "login", path: "/login" }]),
             ].map((link) => (
               <Link
                 key={link.key}
@@ -199,9 +378,19 @@ const App = () => {
                 className="block px-6 py-3 text-white rounded hover:bg-white/20 transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
-                {t(link.key)}
+                {link.label || t(link.key)}
               </Link>
             ))}
+
+            {isMemberAuthenticated && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="block w-full text-left px-6 py-3 text-red-100 rounded hover:bg-red-500/30 transition-colors duration-200"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -229,7 +418,30 @@ const App = () => {
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/groupmember" element={<GroupMember />} />
-          <Route path="/member-dashboard" element={<MemberDashboard />} />
+          <Route
+            path="/member-profile"
+            element={
+              <ProtectedMemberRoute>
+                <Navigate to="/member-dashboard?tab=profile" replace />
+              </ProtectedMemberRoute>
+            }
+          />
+          <Route
+            path="/member-dashboard"
+            element={
+              <ProtectedMemberRoute allowWhenMustChange>
+                <MemberDashboard />
+              </ProtectedMemberRoute>
+            }
+          />
+          <Route
+            path="/member-settings"
+            element={
+              <ProtectedMemberRoute allowWhenMustChange>
+                <Navigate to="/member-dashboard?tab=settings" replace />
+              </ProtectedMemberRoute>
+            }
+          />
         </Routes>
       </main>
       {/* Footer */}
