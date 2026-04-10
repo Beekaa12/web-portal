@@ -1,23 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-const Footer = () => {
+const Footer = ({ isDarkMode = false }) => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1e3a5f] text-white pt-16 pb-8">
+    <footer
+      className={`text-white pt-16 pb-8 ${isDarkMode ? "bg-[#2f3d52]" : "bg-[#1e3a5f]"}`}
+    >
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           {/* About */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">About Us</h3>
-            <p className="text-blue-100 mb-4">
-              Empowering our members through financial services, education, and
-              community support since 2010.
-            </p>
+            <h3 className="text-xl font-semibold mb-4">{t("aboutUsTitle")}</h3>
+            <p className="text-blue-100 mb-4">{t("footerAboutDescription")}</p>
             <div className="flex space-x-4">
               <a href="#" className="text-white hover:text-blue-300">
-                <span className="sr-only">Facebook</span>
+                <span className="sr-only">{t("footerFacebook")}</span>
                 <svg
                   className="h-6 w-6"
                   fill="currentColor"
@@ -31,7 +32,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a href="#" className="text-white hover:text-blue-300">
-                <span className="sr-only">Twitter</span>
+                <span className="sr-only">{t("footerTwitter")}</span>
                 <svg
                   className="h-6 w-6"
                   fill="currentColor"
@@ -41,7 +42,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a href="#" className="text-white hover:text-blue-300">
-                <span className="sr-only">Instagram</span>
+                <span className="sr-only">{t("footerInstagram")}</span>
                 <svg
                   className="h-6 w-6"
                   fill="currentColor"
@@ -59,36 +60,38 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              {t("footerQuickLinksTitle")}
+            </h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-blue-100 hover:text-white">
-                  Home
+                <a href="/" className="text-blue-100 hover:text-white">
+                  {t("home")}
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-100 hover:text-white">
-                  About Us
+                <a href="/about" className="text-blue-100 hover:text-white">
+                  {t("aboutUsTitle")}
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-100 hover:text-white">
-                  Services
+                <a href="/services" className="text-blue-100 hover:text-white">
+                  {t("services")}
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-100 hover:text-white">
-                  Loans
+                <a href="/" className="text-blue-100 hover:text-white">
+                  {t("footerLoans")}
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-100 hover:text-white">
-                  Savings
+                <a href="/" className="text-blue-100 hover:text-white">
+                  {t("footerSavings")}
                 </a>
               </li>
               <li>
-                <a href="#" className="text-blue-100 hover:text-white">
-                  Contact Us
+                <a href="/contact" className="text-blue-100 hover:text-white">
+                  {t("footerContactUs")}
                 </a>
               </li>
             </ul>
@@ -96,36 +99,38 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Our Services</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              {t("servicesPageTitle")}
+            </h3>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="text-blue-100 hover:text-white">
-                  Savings Accounts
+                  {t("servicesSavingsTitle")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-blue-100 hover:text-white">
-                  Loans & Credit
+                  {t("footerLoansCredit")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-blue-100 hover:text-white">
-                  Investment Plans
+                  {t("servicesInvestmentsTitle")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-blue-100 hover:text-white">
-                  Mobile Banking
+                  {t("footerMobileBanking")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-blue-100 hover:text-white">
-                  Financial Advice
+                  {t("footerFinancialAdvice")}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-blue-100 hover:text-white">
-                  Member Benefits
+                  {t("footerMemberBenefits")}
                 </a>
               </li>
             </ul>
@@ -133,7 +138,9 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              {t("footerContactUs")}
+            </h3>
             <address className="not-italic text-blue-100 space-y-2">
               <div className="flex items-start">
                 <svg
@@ -156,9 +163,9 @@ const Footer = () => {
                   />
                 </svg>
                 <span>
-                  208 ROOM 2nd Floor, Registrar BLD
+                  {t("footerAddressLine1")}
                   <br />
-                  Injibara, Ethiopia
+                  {t("footerAddressLine2")}
                 </span>
               </div>
               <div className="flex items-center">
@@ -211,7 +218,7 @@ const Footer = () => {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span>Mon - Fri: 8:00 AM - 5:00 PM</span>
+                <span>{t("footerWorkingHours")}</span>
               </div>
             </address>
           </div>
@@ -220,11 +227,12 @@ const Footer = () => {
         <div className="border-t border-blue-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-blue-100 text-sm mb-4 md:mb-0">
-              &copy; {currentYear} Injibara University | Employees Savings &
-              Credit Management. All rights reserved.
+              {t("footerCopyright", { year: currentYear })}
             </p>
             <div>
-              <span className="text-blue-100 text-sm">Developed by </span>
+              <span className="text-blue-100 text-sm">
+                {t("footerDevelopedBy")}{" "}
+              </span>
               <Link
                 to="/groupmember"
                 className="text-blue-300 hover:text-white text-sm"
@@ -234,10 +242,10 @@ const Footer = () => {
             </div>
             <div className="flex space-x-6">
               <a href="#" className="text-blue-100 hover:text-white text-sm">
-                Privacy Policy
+                {t("footerPrivacyPolicy")}
               </a>
               <a href="#" className="text-blue-100 hover:text-white text-sm">
-                Terms of Service
+                {t("footerTermsOfService")}
               </a>
             </div>
           </div>

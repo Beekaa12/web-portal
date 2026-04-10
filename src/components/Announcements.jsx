@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-const Announcements = () => {
-  const { t, i18n } = useTranslation();
+const Announcements = ({ isDarkMode = false }) => {
+  const { t } = useTranslation();
   const [announcements, setAnnouncements] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(6); 
+  const [visibleCount, setVisibleCount] = useState(6);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -85,14 +85,87 @@ const Announcements = () => {
     setVisibleCount((prev) => prev + 6);
   };
 
+  const pageBgClass = isDarkMode
+    ? "bg-slate-700"
+    : "bg-gradient-to-b from-blue-50 to-white";
+
+  const sectionBgClass = isDarkMode ? "bg-[#2f3d52]" : "bg-white";
+
+  const cardClass = isDarkMode
+    ? "bg-slate-700 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full border border-slate-500"
+    : "bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full border border-gray-100";
+
+  const timeClass = isDarkMode
+    ? "text-sm text-slate-300 font-medium"
+    : "text-sm text-gray-500 font-medium";
+
+  const titleClass = isDarkMode
+    ? "text-xl font-bold text-slate-100 mb-3 line-clamp-2"
+    : "text-xl font-bold text-gray-800 mb-3 line-clamp-2";
+
+  const contentClass = isDarkMode
+    ? "text-slate-200 mb-4 line-clamp-3 flex-grow"
+    : "text-gray-600 mb-4 line-clamp-3 flex-grow";
+
+  const readMoreClass = isDarkMode
+    ? "mt-auto inline-flex items-center text-blue-300 hover:text-blue-200 font-medium group transition-colors"
+    : "mt-auto inline-flex items-center text-blue-600 hover:text-blue-800 font-medium group transition-colors";
+
+  const seeMoreBtnClass = isDarkMode
+    ? "px-6 py-3 text-blue-200 font-extrabold hover:underline transition-all rounded-lg border border-blue-200 hover:bg-blue-200 hover:text-[#1e3a5f]"
+    : "px-6 py-3 text-[#1e3a5f] font-extrabold hover:underline transition-all rounded-lg border border-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white";
+
+  const modalCardClass = isDarkMode
+    ? "bg-slate-700 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-slate-500"
+    : "bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto";
+
+  const modalCloseBtnClass = isDarkMode
+    ? "absolute top-4 right-4 bg-slate-200 rounded-full p-2 hover:bg-white transition-all"
+    : "absolute top-4 right-4 bg-white bg-opacity-80 rounded-full p-2 hover:bg-opacity-100 transition-all";
+
+  const modalTimeClass = isDarkMode
+    ? "text-sm text-slate-300 font-medium"
+    : "text-sm text-gray-500 font-medium";
+
+  const modalTitleClass = isDarkMode
+    ? "text-2xl md:text-3xl font-bold text-slate-100 mb-4"
+    : "text-2xl md:text-3xl font-bold text-gray-800 mb-4";
+
+  const modalBodyClass = isDarkMode
+    ? "prose max-w-none text-slate-100 prose-headings:text-slate-100 prose-strong:text-slate-100 prose-li:text-slate-100"
+    : "prose max-w-none text-gray-700";
+
+  const modalFooterClass = isDarkMode
+    ? "mt-8 pt-6 border-t border-slate-500"
+    : "mt-8 pt-6 border-t border-gray-200";
+
+  const modalFooterTextClass = isDarkMode
+    ? "text-sm text-slate-300"
+    : "text-sm text-gray-500";
+
+  const modalLinkClass = isDarkMode
+    ? "text-blue-300 hover:underline"
+    : "text-blue-600 hover:underline";
+
   if (loading)
-    return <p className="text-center py-16">Loading announcements...</p>;
-  if (error) return <p className="text-center py-16 text-red-500">{error}</p>;
+    return (
+      <p className={`text-center py-16 ${isDarkMode ? "text-slate-100" : ""}`}>
+        {t("loadingAnnouncements")}
+      </p>
+    );
+  if (error)
+    return (
+      <p
+        className={`text-center py-16 ${isDarkMode ? "text-red-300" : "text-red-500"}`}
+      >
+        {error}
+      </p>
+    );
 
   const visibleAnnouncements = announcements.slice(0, visibleCount);
 
   return (
-    <div className="bg-gradient-to-b from-blue-50 to-white">
+    <div className={pageBgClass}>
       {/* Hero Section */}
       <div className="relative bg-[#1e3b5f] text-white py-20">
         <div
@@ -115,13 +188,13 @@ const Announcements = () => {
       </div>
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className={`py-16 ${sectionBgClass}`}>
         <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {visibleAnnouncements.map((announcement) => (
               <div
                 key={announcement._id || announcement.id}
-                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full border border-gray-100"
+                className={cardClass}
               >
                 <div className="h-48 overflow-hidden">
                   <img
@@ -139,19 +212,15 @@ const Announcements = () => {
                     >
                       {announcement.category}
                     </span>
-                    <span className="text-sm text-gray-500 font-medium">
+                    <span className={timeClass}>
                       {timeAgo(announcement.createdAt)}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">
-                    {announcement.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">
-                    {announcement.content}
-                  </p>
+                  <h3 className={titleClass}>{announcement.title}</h3>
+                  <p className={contentClass}>{announcement.content}</p>
                   <button
                     onClick={() => openModal(announcement)}
-                    className="mt-auto inline-flex items-center text-blue-600 hover:text-blue-800 font-medium group transition-colors"
+                    className={readMoreClass}
                   >
                     {t("readFull")}
                     <svg
@@ -176,10 +245,7 @@ const Announcements = () => {
           {/* See More Button */}
           {visibleCount < announcements.length && (
             <div className="text-center mt-8">
-              <button
-                onClick={handleSeeMore}
-                className="px-6 py-3 text-[#1e3a5f] font-extrabold hover:underline transition-all rounded-lg border border-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white"
-              >
+              <button onClick={handleSeeMore} className={seeMoreBtnClass}>
                 {t("seeMore")}
               </button>
             </div>
@@ -193,7 +259,7 @@ const Announcements = () => {
             onClick={closeModal}
           >
             <div
-              className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              className={modalCardClass}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative h-64 md:h-80">
@@ -202,10 +268,7 @@ const Announcements = () => {
                   alt={selectedAnnouncement.title}
                   className="w-full h-full object-cover"
                 />
-                <button
-                  onClick={closeModal}
-                  className="absolute top-4 right-4 bg-white bg-opacity-80 rounded-full p-2 hover:bg-opacity-100 transition-all"
-                >
+                <button onClick={closeModal} className={modalCloseBtnClass}>
                   <svg
                     className="w-6 h-6 text-gray-700"
                     fill="none"
@@ -230,32 +293,29 @@ const Announcements = () => {
                   >
                     {selectedAnnouncement.category}
                   </span>
-                  <span className="text-sm text-gray-500 font-medium">
+                  <span className={modalTimeClass}>
                     {timeAgo(selectedAnnouncement.createdAt)}
                   </span>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+                <h2 className={modalTitleClass}>
                   {selectedAnnouncement.title}
                 </h2>
                 <div
-                  className="prose max-w-none text-gray-700"
+                  className={modalBodyClass}
                   dangerouslySetInnerHTML={{
                     __html: selectedAnnouncement.content,
                   }}
                 />
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <p className="text-sm text-gray-500">
+                <div className={modalFooterClass}>
+                  <p className={modalFooterTextClass}>
                     {t("contactInfo")}{" "}
-                    <a
-                      href="tel:+254700000000"
-                      className="text-blue-600 hover:underline"
-                    >
+                    <a href="tel:+254700000000" className={modalLinkClass}>
                       +251 910 000 00
                     </a>{" "}
                     {t("orEmail")}{" "}
                     <a
                       href="mailto:sacco@inu.edu.et"
-                      className="text-blue-600 hover:underline"
+                      className={modalLinkClass}
                     >
                       sacco@inu.edu.et
                     </a>

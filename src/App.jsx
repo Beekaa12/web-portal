@@ -48,7 +48,7 @@ const ProtectedMemberRoute = ({ children, allowWhenMustChange = false }) => {
   }
 
   if (!memberToken) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (memberProfile?.must_change_password && !allowWhenMustChange) {
@@ -65,6 +65,19 @@ const App = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      return true;
+    }
+
+    if (savedTheme === "light") {
+      return false;
+    }
+
+    return false;
+  });
   const [memberSession, setMemberSession] = useState(getStoredMemberSession);
   const mobileMenuRef = useRef(null);
   const profileMenuRef = useRef(null);
@@ -95,6 +108,11 @@ const App = () => {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDarkMode);
+    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+  }, [isDarkMode]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -133,15 +151,22 @@ const App = () => {
     setMemberSession({ token: null, profile: null });
     setIsProfileMenuOpen(false);
     setIsMenuOpen(false);
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
+  };
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
   };
 
   const { t, i18n } = useTranslation();
+  const desktopNavLinkClass =
+    "px-4 py-2 font-medium text-white hover:text-blue-200";
+
   const LanguageSwitcher = ({ className }) => (
     <select
       onChange={(e) => i18n.changeLanguage(e.target.value)}
       value={i18n.language}
-      className={`bg-transparent text-white px-1 py-1 rounded hover:border hover:bg-[#06575d] ${className}`}
+      className={`bg-transparent text-white px-1 py-1 rounded transition-all duration-300 hover:border hover:bg-[#215487] ${className}`}
     >
       <option className="text-black" value="en">
         {t("english")}
@@ -153,7 +178,11 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div
+      className={`min-h-screen flex flex-col transition-colors duration-300 ${
+        isDarkMode ? "bg-[#0b1220] text-slate-100" : ""
+      }`}
+    >
       {/* Navigation */}
       <header
         className={`fixed w-full z-50 transition-all duration-300 ${
@@ -172,69 +201,74 @@ const App = () => {
             {/* Desktop Navigation */}
             <div className="flex-1"></div>
             <div className="hidden md:flex space-x-1 gap-2">
-              <Link
-                to="/"
-                className={`px-4 py-2 font-medium ${
-                  isScrolled
-                    ? "text-white hover:text-blue-200"
-                    : "text-white hover:text-blue-200"
-                }`}
-              >
+              <Link to="/" className={desktopNavLinkClass}>
                 {t("home")}
               </Link>
-              <Link
-                to="/about"
-                className={`px-4 py-2 font-medium ${
-                  isScrolled
-                    ? "text-white hover:text-blue-200"
-                    : "text-white hover:text-blue-200"
-                }`}
-              >
+              <Link to="/about" className={desktopNavLinkClass}>
                 {t("about")}
               </Link>
-              <Link
-                to="/announcements"
-                className={`px-4 py-2 font-medium ${
-                  isScrolled
-                    ? "text-white hover:text-blue-200"
-                    : "text-white hover:text-blue-200"
-                }`}
-              >
+              <Link to="/announcements" className={desktopNavLinkClass}>
                 {t("announcements")}
               </Link>
-              <Link
-                to="/services"
-                className={`px-4 py-2 font-medium ${
-                  isScrolled
-                    ? "text-white hover:text-blue-200"
-                    : "text-white hover:text-blue-200"
-                }`}
-              >
+              <Link to="/services" className={desktopNavLinkClass}>
                 {t("services")}
               </Link>
-              <Link
-                to="/contact"
-                className={`px-4 py-2 font-medium ${
-                  isScrolled
-                    ? "text-white hover:text-blue-200"
-                    : "text-white hover:text-blue-200"
-                }`}
-              >
+              <Link to="/contact" className={desktopNavLinkClass}>
                 {t("contact")}
               </Link>
-              <Link
-                to="/download-forms"
-                className={`px-4 py-2 font-medium ${
-                  isScrolled
-                    ? "text-white hover:text-blue-200"
-                    : "text-white hover:text-blue-200"
-                }`}
-              >
+              <Link to="/download-forms" className={desktopNavLinkClass}>
                 {t("downloadForms")}
               </Link>
             </div>
             {/* Desktop */}
             <div className="hidden md:flex items-center gap-6 ml-14 mr-10">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                title={
+                  isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+                }
+                aria-label={
+                  isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+                }
+                className={`h-9 w-9 inline-flex items-center justify-center rounded-full transition-all duration-300 ${
+                  isScrolled
+                    ? "border-white text-white hover:bg-[#f2f6fb] hover:text-[#1e3a5f]"
+                    : "border-[#1e3a5f] text-white hover:bg-white hover:text-[#1e3a5f]"
+                }`}
+              >
+                {isDarkMode ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364 6.364l.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
+                  </svg>
+                )}
+              </button>
               <LanguageSwitcher />
               {isMemberAuthenticated ? (
                 <div className="relative" ref={profileMenuRef}>
@@ -255,34 +289,56 @@ const App = () => {
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-44 rounded-xl border border-gray-100 bg-white shadow-xl py-2">
+                    <div
+                      className={`absolute right-0 mt-3 w-44 rounded-xl border shadow-xl py-2 ${
+                        isDarkMode
+                          ? "border-slate-500 bg-slate-700"
+                          : "border-gray-100 bg-white"
+                      }`}
+                    >
                       <Link
                         to="/member-dashboard?tab=dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className={`block px-4 py-2 text-sm ${
+                          isDarkMode
+                            ? "text-slate-100 hover:bg-slate-600"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        Dashboard
+                        {t("dashboard")}
                       </Link>
                       <Link
                         to="/member-dashboard?tab=profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className={`block px-4 py-2 text-sm ${
+                          isDarkMode
+                            ? "text-slate-100 hover:bg-slate-600"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        Profile
+                        {t("profile")}
                       </Link>
                       <Link
                         to="/member-dashboard?tab=settings"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className={`block px-4 py-2 text-sm ${
+                          isDarkMode
+                            ? "text-slate-100 hover:bg-slate-600"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        Setting
+                        {t("Settings")}
                       </Link>
                       <button
                         type="button"
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          isDarkMode
+                            ? "text-red-300 hover:bg-red-500/25"
+                            : "text-red-600 hover:bg-red-50"
+                        }`}
                         onClick={handleLogout}
                       >
-                        Logout
+                        {t("logout")}
                       </button>
                     </div>
                   )}
@@ -301,6 +357,57 @@ const App = () => {
                   {t("login")}
                 </Link>
               )}
+            </div>
+
+            {/* Mobile Theme Toggle */}
+            <div className="md:hidden mr-2">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                title={
+                  isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+                }
+                aria-label={
+                  isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+                }
+                className={`h-9 w-9 inline-flex items-center justify-center rounded-full transition-all duration-300 ${
+                  isScrolled
+                    ? "border-white text-white hover:bg-[#f2f6fb] hover:text-[#1e3a5f]"
+                    : "border-[#1e3a5f] text-white hover:bg-white hover:text-[#1e3a5f]"
+                }`}
+              >
+                {isDarkMode ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 3v1m0 16v1m8-9h1M3 12H2m15.364 6.364l.707.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
+                  </svg>
+                )}
+              </button>
             </div>
 
             {/* Mobile */}
@@ -357,17 +464,17 @@ const App = () => {
                     {
                       key: "memberProfile",
                       path: "/member-dashboard?tab=profile",
-                      label: "Profile",
+                      label: t("profile"),
                     },
                     {
                       key: "memberDashboard",
                       path: "/member-dashboard?tab=dashboard",
-                      label: "Dashboard",
+                      label: t("dashboard"),
                     },
                     {
                       key: "memberSettings",
                       path: "/member-dashboard?tab=settings",
-                      label: "Setting",
+                      label: t("Settings"),
                     },
                   ]
                 : [{ key: "login", path: "/login" }]),
@@ -386,38 +493,57 @@ const App = () => {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="block w-full text-left px-6 py-3 text-red-100 rounded hover:bg-red-500/30 transition-colors duration-200"
+                className="block w-full text-left px-6 py-3 text-red-200 rounded hover:bg-red-500/30 transition-colors duration-200"
               >
-                Logout
+                {t("logout")}
               </button>
             )}
           </div>
         </div>
       </header>
       {/* Main Content */}
-      <main className="flex-grow">
+      <main
+        className={`flex-grow transition-colors duration-300 ${
+          isDarkMode ? "bg-slate-700" : ""
+        }`}
+      >
         <Routes>
           <Route
             path="/"
             element={
               <>
                 <Hero />
-                <Divider />
-                <Announcements />
-                <About />
-                <Services />
-                <Leaders />
-                <Contact />
+                <Divider isDarkMode={isDarkMode} />
+                <Announcements isDarkMode={isDarkMode} />
+                <About isDarkMode={isDarkMode} />
+                <Services isDarkMode={isDarkMode} />
+                <Leaders isDarkMode={isDarkMode} />
+                <Contact isDarkMode={isDarkMode} />
               </>
             }
           />
-          <Route path="/about" element={<About />} />
-          <Route path="/announcements" element={<Announcements />} />
-          <Route path="/download-forms" element={<DownloadForms />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/groupmember" element={<GroupMember />} />
+          <Route path="/about" element={<About isDarkMode={isDarkMode} />} />
+          <Route
+            path="/announcements"
+            element={<Announcements isDarkMode={isDarkMode} />}
+          />
+          <Route
+            path="/download-forms"
+            element={<DownloadForms isDarkMode={isDarkMode} />}
+          />
+          <Route path="/login" element={<Login isDarkMode={isDarkMode} />} />
+          <Route
+            path="/services"
+            element={<Services isDarkMode={isDarkMode} />}
+          />
+          <Route
+            path="/contact"
+            element={<Contact isDarkMode={isDarkMode} />}
+          />
+          <Route
+            path="/groupmember"
+            element={<GroupMember isDarkMode={isDarkMode} />}
+          />
           <Route
             path="/member-profile"
             element={
@@ -430,7 +556,7 @@ const App = () => {
             path="/member-dashboard"
             element={
               <ProtectedMemberRoute allowWhenMustChange>
-                <MemberDashboard />
+                <MemberDashboard isDarkMode={isDarkMode} />
               </ProtectedMemberRoute>
             }
           />
@@ -445,7 +571,7 @@ const App = () => {
         </Routes>
       </main>
       {/* Footer */}
-      <Footer />
+      <Footer isDarkMode={isDarkMode} />
     </div>
   );
 };

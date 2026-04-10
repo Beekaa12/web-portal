@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-const Contact = () => {
-const { t, i18n } = useTranslation();
+const Contact = ({ isDarkMode = false }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,8 +56,30 @@ const { t, i18n } = useTranslation();
     }
   };
 
+  const sectionBgClass = isDarkMode
+    ? "bg-gradient-to-b from-slate-800 to-slate-700"
+    : "bg-gradient-to-b from-blue-50 to-white";
+
+  const contentBgClass = isDarkMode ? "bg-[#2f3d52]" : "bg-white";
+
+  const cardClass = isDarkMode
+    ? "max-w-4xl mx-auto bg-slate-700 border border-slate-500 rounded-xl shadow-lg p-8 md:p-10"
+    : "max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 md:p-10";
+
+  const labelClass = isDarkMode
+    ? "block text-slate-100 font-medium mb-2"
+    : "block text-gray-700 font-medium mb-2";
+
+  const inputClass = isDarkMode
+    ? "w-full px-4 py-3 rounded-lg border border-slate-400 bg-slate-600 text-slate-50 placeholder-slate-200 focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all hover:border-slate-300"
+    : "w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300";
+
+  const submitBtnClass = isDarkMode
+    ? "w-full md:w-auto px-8 py-3 bg-[#1e3a5f] text-white font-semibold rounded-lg hover:bg-[#16324f] focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 focus:ring-offset-slate-800 transition-all transform hover:-translate-y-0.5"
+    : "w-full md:w-auto px-8 py-3 bg-[#1e3a5f] text-white font-semibold rounded-lg hover:bg-[#16324f] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all transform hover:-translate-y-0.5";
+
   return (
-    <div className="bg-gradient-to-b from-blue-50 to-white">
+    <div className={sectionBgClass}>
       {/* Hero Section */}
       <div className="relative bg-[#1e3a5f] text-white py-20">
         <div
@@ -80,9 +102,9 @@ const { t, i18n } = useTranslation();
       </div>
 
       {/* Main Content */}
-      <section id="contact" className="py-16 bg-white">
+      <section id="contact" className={`py-16 ${contentBgClass}`}>
         <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 md:p-10">
+          <div className={cardClass}>
             {isSubmitted && (
               <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded">
                 <p className="font-medium">{t("successTitle")}</p>
@@ -100,10 +122,7 @@ const { t, i18n } = useTranslation();
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-gray-700 font-medium mb-2"
-                  >
+                  <label htmlFor="name" className={labelClass}>
                     {t("nameLabel")} <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -112,17 +131,14 @@ const { t, i18n } = useTranslation();
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
+                    className={inputClass}
                     placeholder={t("namePlaceholder")}
                     required
                   />
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-gray-700 font-medium mb-2"
-                  >
+                  <label htmlFor="email" className={labelClass}>
                     {t("emailLabel")}
                     <span className="text-red-500">*</span>
                   </label>
@@ -132,17 +148,14 @@ const { t, i18n } = useTranslation();
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
+                    className={inputClass}
                     placeholder={t("emailPlaceholder")}
                     required
                   />
                 </div>
               </div>
               <div>
-                <label
-                  htmlFor="subject"
-                  className="block text-gray-700 font-medium mb-2"
-                >
+                <label htmlFor="subject" className={labelClass}>
                   {t("subjectLabel")}
                 </label>
                 <input
@@ -151,16 +164,13 @@ const { t, i18n } = useTranslation();
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
+                  className={inputClass}
                   placeholder={t("subjectPlaceholder")}
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="message"
-                  className="block text-gray-700 font-medium mb-2"
-                >
+                <label htmlFor="message" className={labelClass}>
                   {t("messageLabel")} <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -169,7 +179,7 @@ const { t, i18n } = useTranslation();
                   rows="5"
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:border-blue-300"
+                  className={inputClass}
                   placeholder={t("messagePlaceholder")}
                   required
                 ></textarea>
@@ -179,7 +189,7 @@ const { t, i18n } = useTranslation();
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all transform hover:-translate-y-0.5 ${
+                  className={`${submitBtnClass} ${
                     isSubmitting ? "opacity-75 cursor-not-allowed" : ""
                   }`}
                 >

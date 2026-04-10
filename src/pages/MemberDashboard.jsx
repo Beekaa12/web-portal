@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = (
   import.meta.env.VITE_API_URL || "http://localhost:5000"
@@ -29,9 +30,10 @@ const toSavingLabel = (savingType = "") =>
     .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
     .join(" + ") || "-";
 
-const MemberDashboard = () => {
+const MemberDashboard = ({ isDarkMode = false }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
 
   const currentTab = searchParams.get("tab") || "dashboard";
   const activeTab = ["dashboard", "profile", "settings"].includes(currentTab)
@@ -102,13 +104,15 @@ const MemberDashboard = () => {
         }
 
         if (!response.ok) {
-          throw new Error(payload?.message || "Failed to load dashboard data");
+          throw new Error(
+            payload?.message || t("memberDashboardLoadDataFailed"),
+          );
         }
 
         setDashboardData(payload?.data || null);
       } catch (fetchError) {
         console.error("Error loading member dashboard:", fetchError);
-        setError(fetchError.message || "Unable to load dashboard data");
+        setError(fetchError.message || t("memberDashboardUnableLoadData"));
       } finally {
         setLoading(false);
       }
@@ -155,7 +159,9 @@ const MemberDashboard = () => {
         }
 
         if (!response.ok || payload?.success === false) {
-          throw new Error(payload?.message || "Failed to load savings history");
+          throw new Error(
+            payload?.message || t("memberDashboardLoadSavingsFailed"),
+          );
         }
 
         setSavingsTransactions(
@@ -165,7 +171,7 @@ const MemberDashboard = () => {
         console.error("Error loading savings history:", historyError);
         setSavingsTransactions([]);
         setTransactionsError(
-          historyError.message || "Unable to load savings history",
+          historyError.message || t("memberDashboardUnableLoadSavings"),
         );
       } finally {
         setTransactionsLoading(false);
@@ -204,7 +210,7 @@ const MemberDashboard = () => {
     e.preventDefault();
 
     if (!selectedProfileFile) {
-      setImageError("Please choose an image first.");
+      setImageError(t("memberDashboardChooseImageFirst"));
       return;
     }
 
@@ -236,7 +242,9 @@ const MemberDashboard = () => {
       }
 
       if (!response.ok) {
-        throw new Error(payload?.message || "Failed to update profile image");
+        throw new Error(
+          payload?.message || t("memberDashboardUpdateImageFailed"),
+        );
       }
 
       const nextImageUrl = payload?.member?.profile_image || "";
@@ -266,9 +274,11 @@ const MemberDashboard = () => {
       );
 
       setSelectedProfileFile(null);
-      setImageSuccess("Profile image updated successfully.");
+      setImageSuccess(t("memberDashboardImageUpdatedSuccess"));
     } catch (uploadError) {
-      setImageError(uploadError.message || "Could not update profile image.");
+      setImageError(
+        uploadError.message || t("memberDashboardImageUpdateFailed"),
+      );
     } finally {
       setImageUploading(false);
     }
@@ -278,12 +288,12 @@ const MemberDashboard = () => {
     e.preventDefault();
 
     if (formData.new_password.length < 8) {
-      setFormError("New password must be at least 8 characters.");
+      setFormError(t("memberDashboardPasswordMinLength"));
       return;
     }
 
     if (formData.new_password !== formData.confirm_password) {
-      setFormError("New password and confirm password do not match.");
+      setFormError(t("memberDashboardPasswordMismatch"));
       return;
     }
 
@@ -309,7 +319,9 @@ const MemberDashboard = () => {
       const payload = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(payload?.message || "Failed to change password");
+        throw new Error(
+          payload?.message || t("memberDashboardPasswordChangeFailed"),
+        );
       }
 
       let latestProfile = {};
@@ -327,7 +339,7 @@ const MemberDashboard = () => {
       localStorage.setItem("member_profile", JSON.stringify(updatedProfile));
       setMustChangePassword(false);
 
-      setFormSuccess("Password changed successfully.");
+      setFormSuccess(t("memberDashboardPasswordChangedSuccess"));
       setFormData({
         current_password: "",
         new_password: "",
@@ -338,7 +350,9 @@ const MemberDashboard = () => {
         handleTabChange("dashboard");
       }, 800);
     } catch (submitError) {
-      setFormError(submitError.message || "Could not change password.");
+      setFormError(
+        submitError.message || t("memberDashboardPasswordChangeError"),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -351,16 +365,65 @@ const MemberDashboard = () => {
     totalBalance: 0,
     loanAmount: 0,
     loanOutstanding: 0,
-    loanStatus: "No Active Loan",
+    loanStatus: t("memberDashboardNoActiveLoan"),
   };
   const savingsHistory = savingsTransactions;
 
+  const pageBgClass = isDarkMode
+    ? "min-h-screen bg-gradient-to-b from-[#2f3d52] to-slate-700"
+    : "min-h-screen bg-gradient-to-b from-blue-50 to-white";
+
+  const contentSectionClass = isDarkMode ? "bg-[#2f3d52]" : "";
+
+  const panelClass = isDarkMode
+    ? "bg-slate-700 rounded-2xl border border-slate-500 shadow-md p-6 md:p-8"
+    : "bg-white rounded-2xl border border-gray-100 shadow-md p-6 md:p-8";
+
+  const statCardClass = isDarkMode
+    ? "bg-slate-700 rounded-xl border border-slate-500 shadow-sm p-6"
+    : "bg-white rounded-xl border border-gray-100 shadow-sm p-6";
+
+  const titleTextClass = isDarkMode
+    ? "text-xl font-bold text-slate-100"
+    : "text-xl font-bold text-gray-800";
+
+  const subtitleTextClass = isDarkMode ? "text-slate-200" : "text-gray-600";
+
+  const softBadgeClass = isDarkMode
+    ? "inline-flex items-center px-3 py-1 rounded-full bg-slate-600 text-blue-200 text-sm font-semibold border border-slate-400"
+    : "inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-[#1e3a5f] text-sm font-semibold border border-blue-200";
+
+  const tableHeadClass = isDarkMode
+    ? "border-b border-slate-500 text-sm text-slate-200"
+    : "border-b border-gray-200 text-sm text-gray-500";
+
+  const tableRowClass = isDarkMode
+    ? "border-b border-slate-600 text-slate-100"
+    : "border-b border-gray-100 text-gray-700";
+
+  const inputClass = isDarkMode
+    ? "w-full px-4 py-2 border border-slate-500 bg-slate-600 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+    : "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]";
+
+  const accentTextClass = isDarkMode ? "text-blue-200" : "text-[#1e3a5f]";
+  const amountTextClass = isDarkMode ? "text-slate-100" : "text-[#1e3a5f]";
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center">
+      <div className={`${pageBgClass} flex items-center justify-center`}>
         <div className="text-center">
-          <div className="h-12 w-12 mx-auto rounded-full border-4 border-blue-200 border-t-[#1e3a5f] animate-spin" />
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <div
+            className={`h-12 w-12 mx-auto rounded-full border-4 animate-spin ${
+              isDarkMode
+                ? "border-slate-500 border-t-slate-100"
+                : "border-blue-200 border-t-[#1e3a5f]"
+            }`}
+          />
+          <p
+            className={`mt-4 ${isDarkMode ? "text-slate-200" : "text-gray-600"}`}
+          >
+            {t("memberDashboardLoading")}
+          </p>
         </div>
       </div>
     );
@@ -368,17 +431,27 @@ const MemberDashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white border border-red-200 rounded-xl p-6 text-center">
+      <div className={`${pageBgClass} flex items-center justify-center p-4`}>
+        <div
+          className={`max-w-md w-full rounded-xl p-6 text-center border ${
+            isDarkMode
+              ? "bg-slate-700 border-red-400"
+              : "bg-white border-red-200"
+          }`}
+        >
           <h2 className="text-xl font-semibold text-red-700">
-            Unable to load dashboard
+            {t("memberDashboardUnableLoadTitle")}
           </h2>
-          <p className="mt-2 text-gray-600">{error}</p>
+          <p
+            className={`mt-2 ${isDarkMode ? "text-slate-200" : "text-gray-600"}`}
+          >
+            {error}
+          </p>
           <button
             onClick={() => navigate("/login", { replace: true })}
             className="mt-5 px-4 py-2 rounded-lg bg-[#1e3a5f] text-white"
           >
-            Back to Login
+            {t("memberDashboardBackToLogin")}
           </button>
         </div>
       </div>
@@ -386,7 +459,7 @@ const MemberDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className={pageBgClass}>
       <section className="relative bg-[#1e3a5f] text-white py-20">
         <div
           className="absolute inset-0 opacity-25"
@@ -400,75 +473,94 @@ const MemberDashboard = () => {
 
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Member Dashboard
+            {t("memberDashboardTitle")}
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Profile overview, savings balances, loan summary, and saving history
-            tracking.
+            {t("memberDashboardSubtitle")}
           </p>
         </div>
       </section>
 
-      <section className="py-12 mx-auto md:mx-8">
+      <section className={`py-12 mx-auto md:mx-8 ${contentSectionClass}`}>
         <div className="container mx-auto px-4 space-y-8">
           {activeTab === "dashboard" && (
             <>
-              <div className="bg-white rounded-2xl border border-blue-100 shadow-md p-6 md:p-8">
+              <div className={panelClass}>
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                   <img
                     src={
                       member.profile_image ||
                       "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80"
                     }
-                    alt={`${member.full_name || "Member"} profile`}
+                    alt={`${member.full_name || t("memberLabel")} ${t("profile")}`}
                     className="w-28 h-28 rounded-full object-cover border-4 border-blue-100"
                   />
 
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      {member.full_name || "Member"}
+                    <h2
+                      className={`text-2xl font-bold ${
+                        isDarkMode ? "text-slate-100" : "text-gray-800"
+                      }`}
+                    >
+                      {member.full_name || t("memberLabel")}
                     </h2>
-                    <p className="text-gray-600">
-                      Employee ID: {member.employee_id || "-"}
+                    <p className={subtitleTextClass}>
+                      {t("memberDashboardEmployeeId")}:{" "}
+                      {member.employee_id || "-"}
                     </p>
-                    <p className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-[#1e3a5f] text-sm font-semibold border border-blue-200">
-                      Saving Type: {toSavingLabel(member.saving_type)}
+                    <p className={softBadgeClass}>
+                      {t("memberDashboardSavingType")}:{" "}
+                      {toSavingLabel(member.saving_type)}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <article className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                  <p className="text-sm text-gray-500 mb-2">
-                    Compulsory Saving
+                <article className={statCardClass}>
+                  <p
+                    className={`text-sm mb-2 ${
+                      isDarkMode ? "text-slate-200" : "text-gray-500"
+                    }`}
+                  >
+                    {t("memberDashboardCompulsorySaving")}
                   </p>
-                  <h3 className="text-2xl font-bold text-[#1e3a5f]">
+                  <h3 className={`text-2xl font-bold ${amountTextClass}`}>
                     {formatCurrency(summary.compulsoryBalance)}
                   </h3>
                 </article>
 
-                <article className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                  <p className="text-sm text-gray-500 mb-2">Voluntary Saving</p>
-                  <h3 className="text-2xl font-bold text-[#1e3a5f]">
+                <article className={statCardClass}>
+                  <p
+                    className={`text-sm mb-2 ${
+                      isDarkMode ? "text-slate-200" : "text-gray-500"
+                    }`}
+                  >
+                    {t("memberDashboardVoluntarySaving")}
+                  </p>
+                  <h3 className={`text-2xl font-bold ${amountTextClass}`}>
                     {formatCurrency(summary.voluntaryBalance)}
                   </h3>
                 </article>
 
-                <article className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                  <p className="text-sm text-gray-500 mb-2">
-                    Total Saving Balance
+                <article className={statCardClass}>
+                  <p
+                    className={`text-sm mb-2 ${
+                      isDarkMode ? "text-slate-200" : "text-gray-500"
+                    }`}
+                  >
+                    {t("memberDashboardTotalSavingBalance")}
                   </p>
-                  <h3 className="text-2xl font-bold text-[#1e3a5f]">
+                  <h3 className={`text-2xl font-bold ${amountTextClass}`}>
                     {formatCurrency(summary.totalBalance)}
                   </h3>
                 </article>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+              <div className={panelClass}>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <h3 className="text-xl font-bold text-gray-800">
-                    Loan Summary
+                  <h3 className={titleTextClass}>
+                    {t("memberDashboardLoanSummary")}
                   </h3>
                   <span className="inline-flex px-3 py-1 rounded-full text-sm font-semibold bg-amber-50 text-amber-700 border border-amber-200 w-fit">
                     {summary.loanStatus}
@@ -476,13 +568,17 @@ const MemberDashboard = () => {
                 </div>
                 <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <p className="text-gray-600">Amount of loan</p>
-                    <p className="text-3xl font-bold text-[#1e3a5f] mt-1">
+                    <p className={subtitleTextClass}>
+                      {t("memberDashboardAmountOfLoan")}
+                    </p>
+                    <p className={`text-3xl font-bold mt-1 ${amountTextClass}`}>
                       {formatCurrency(summary.loanAmount)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Rest loan (outstanding)</p>
+                    <p className={subtitleTextClass}>
+                      {t("memberDashboardRestLoan")}
+                    </p>
                     <p className="text-3xl font-bold text-amber-700 mt-1">
                       {formatCurrency(summary.loanOutstanding)}
                     </p>
@@ -490,32 +586,46 @@ const MemberDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-5">
-                  Saving History Track
+              <div className={panelClass}>
+                <h3 className={`${titleTextClass} mb-5`}>
+                  {t("memberDashboardSavingHistoryTrack")}
                 </h3>
 
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[640px] text-left">
                     <thead>
-                      <tr className="border-b border-gray-200 text-sm text-gray-500">
-                        <th className="py-3 pr-4">Date</th>
-                        <th className="py-3 px-4">Saving Type</th>
-                        <th className="py-3 px-4">Deposit</th>
-                        <th className="py-3 px-4">Withdrawal</th>
-                        <th className="py-3 px-4">Interest</th>
-                        <th className="py-3 px-4">Net</th>
-                        <th className="py-3 pl-4">Status</th>
+                      <tr className={tableHeadClass}>
+                        <th className="py-3 pr-4">
+                          {t("memberDashboardDate")}
+                        </th>
+                        <th className="py-3 px-4">
+                          {t("memberDashboardSavingType")}
+                        </th>
+                        <th className="py-3 px-4">
+                          {t("memberDashboardDeposit")}
+                        </th>
+                        <th className="py-3 px-4">
+                          {t("memberDashboardWithdrawal")}
+                        </th>
+                        <th className="py-3 px-4">
+                          {t("memberDashboardInterest")}
+                        </th>
+                        <th className="py-3 px-4">{t("memberDashboardNet")}</th>
+                        <th className="py-3 pl-4">
+                          {t("memberDashboardStatus")}
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {transactionsLoading && (
                         <tr>
                           <td
-                            className="py-6 text-center text-gray-500"
+                            className={`py-6 text-center ${
+                              isDarkMode ? "text-slate-200" : "text-gray-500"
+                            }`}
                             colSpan={7}
                           >
-                            Loading savings history...
+                            {t("memberDashboardLoadingSavingsHistory")}
                           </td>
                         </tr>
                       )}
@@ -534,17 +644,20 @@ const MemberDashboard = () => {
                             savingType.slice(1).toLowerCase();
 
                           return (
-                            <tr
-                              key={item.id}
-                              className="border-b border-gray-100 text-gray-700"
-                            >
+                            <tr key={item.id} className={tableRowClass}>
                               <td className="py-3 pr-4 font-medium">
                                 {formatDate(
                                   item.record_date || item.created_at,
                                 )}
                               </td>
                               <td className="py-3 px-4">
-                                <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border bg-blue-50 text-[#1e3a5f] border-blue-200">
+                                <span
+                                  className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                                    isDarkMode
+                                      ? "bg-slate-600 text-blue-200 border-slate-400"
+                                      : "bg-blue-50 text-[#1e3a5f] border-blue-200"
+                                  }`}
+                                >
                                   {normalizedType}
                                 </span>
                               </td>
@@ -568,7 +681,9 @@ const MemberDashboard = () => {
                                       : "bg-amber-50 text-amber-700 border-amber-200"
                                   }`}
                                 >
-                                  {net >= 0 ? "Recorded" : "Adjusted"}
+                                  {net >= 0
+                                    ? t("memberDashboardRecorded")
+                                    : t("memberDashboardAdjusted")}
                                 </span>
                               </td>
                             </tr>
@@ -591,10 +706,12 @@ const MemberDashboard = () => {
                         savingsHistory.length === 0 && (
                           <tr>
                             <td
-                              className="py-6 text-center text-gray-500"
+                              className={`py-6 text-center ${
+                                isDarkMode ? "text-slate-200" : "text-gray-500"
+                              }`}
                               colSpan={7}
                             >
-                              No savings history found.
+                              {t("memberDashboardNoSavingsHistory")}
                             </td>
                           </tr>
                         )}
@@ -606,137 +723,204 @@ const MemberDashboard = () => {
           )}
 
           {activeTab === "profile" && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
-              <div className="flex flex-col md:flex-row md:items-center gap-6 pb-6 border-b border-gray-100 mb-6">
+            <div className={panelClass}>
+              <div
+                className={`flex flex-col md:flex-row md:items-center gap-6 pb-6 mb-6 border-b ${
+                  isDarkMode ? "border-slate-500" : "border-gray-100"
+                }`}
+              >
                 <img
                   src={
                     member.profile_image ||
                     "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80"
                   }
-                  alt={member.full_name || "Member"}
+                  alt={member.full_name || t("memberLabel")}
                   className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
                 />
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-[#1e3a5f]">
-                    {member.full_name || "Member"}
+                  <h2
+                    className={`text-2xl md:text-3xl font-bold ${accentTextClass}`}
+                  >
+                    {member.full_name || t("memberLabel")}
                   </h2>
-                  <p className="text-gray-600 mt-1">
-                    Employee ID: {member.employee_id || "-"}
+                  <p className={`${subtitleTextClass} mt-1`}>
+                    {t("memberDashboardEmployeeId")}:{" "}
+                    {member.employee_id || "-"}
                   </p>
-                  <p className="text-gray-600">
-                    Status: {member.status || "-"}
+                  <p className={subtitleTextClass}>
+                    {t("memberDashboardStatus")}: {member.status || "-"}
                   </p>
-                  <p className="inline-flex items-center mt-2 px-3 py-1 rounded-full bg-blue-50 text-[#1e3a5f] text-sm font-semibold border border-blue-200">
-                    Saving Type: {toSavingLabel(member.saving_type)}
+                  <p className={`${softBadgeClass} mt-2`}>
+                    {t("memberDashboardSavingType")}:{" "}
+                    {toSavingLabel(member.saving_type)}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div
+                className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${
+                  isDarkMode ? "text-slate-100" : "text-gray-800"
+                }`}
+              >
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-[#1e3a5f]">Identity</h4>
+                  <h4 className={`font-semibold ${accentTextClass}`}>
+                    {t("memberDashboardIdentity")}
+                  </h4>
                   <p>
-                    <span className="font-medium">ID:</span> {member.id || "-"}
+                    <span className="font-medium">
+                      {t("memberDashboardId")}:
+                    </span>{" "}
+                    {member.id || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Employee ID:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardEmployeeId")}:
+                    </span>{" "}
                     {member.employee_id || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Full Name:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardFullName")}:
+                    </span>{" "}
                     {member.full_name || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Status:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardStatus")}:
+                    </span>{" "}
                     {member.status || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Registration Date:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardRegistrationDate")}:
+                    </span>{" "}
                     {formatDate(member.registration_date)}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-[#1e3a5f]">Contact</h4>
+                  <h4 className={`font-semibold ${accentTextClass}`}>
+                    {t("memberDashboardContact")}
+                  </h4>
                   <p>
-                    <span className="font-medium">Phone:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardPhone")}:
+                    </span>{" "}
                     {member.phone || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Email:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardEmail")}:
+                    </span>{" "}
                     {member.email || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Created At:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardCreatedAt")}:
+                    </span>{" "}
                     {formatDate(member.created_at)}
                   </p>
                   <p>
-                    <span className="font-medium">Updated At:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardUpdatedAt")}:
+                    </span>{" "}
                     {formatDate(member.updated_at)}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-[#1e3a5f]">Work</h4>
+                  <h4 className={`font-semibold ${accentTextClass}`}>
+                    {t("memberDashboardWork")}
+                  </h4>
                   <p>
-                    <span className="font-medium">Department:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardDepartment")}:
+                    </span>{" "}
                     {member.department || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Occupation:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardOccupation")}:
+                    </span>{" "}
                     {member.occupation || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Job Place:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardJobPlace")}:
+                    </span>{" "}
                     {member.job_place || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Monthly Salary:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardMonthlySalary")}:
+                    </span>{" "}
                     {formatCurrency(member.monthly_salary)}
                   </p>
                   <p>
-                    <span className="font-medium">Approved By:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardApprovedBy")}:
+                    </span>{" "}
                     {member.approved_by || "-"}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-[#1e3a5f]">Address</h4>
+                  <h4 className={`font-semibold ${accentTextClass}`}>
+                    {t("memberDashboardAddress")}
+                  </h4>
                   <p>
-                    <span className="font-medium">Town:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardTown")}:
+                    </span>{" "}
                     {member.town || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Zone:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardZone")}:
+                    </span>{" "}
                     {member.zone || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Woreda:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardWoreda")}:
+                    </span>{" "}
                     {member.woreda || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">Kebele:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardKebele")}:
+                    </span>{" "}
                     {member.kebele || "-"}
                   </p>
                   <p>
-                    <span className="font-medium">House No:</span>{" "}
+                    <span className="font-medium">
+                      {t("memberDashboardHouseNo")}:
+                    </span>{" "}
                     {member.house_no || "-"}
                   </p>
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <h4 className="font-semibold text-[#1e3a5f]">Saving Setup</h4>
+                  <h4 className={`font-semibold ${accentTextClass}`}>
+                    {t("memberDashboardSavingSetup")}
+                  </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <p>
-                      <span className="font-medium">Saving Type:</span>{" "}
+                      <span className="font-medium">
+                        {t("memberDashboardSavingType")}:
+                      </span>{" "}
                       {toSavingLabel(member.saving_type)}
                     </p>
                     <p>
-                      <span className="font-medium">Saving Percentage:</span>{" "}
+                      <span className="font-medium">
+                        {t("memberDashboardSavingPercentage")}:
+                      </span>{" "}
                       {member.saving_percentage || 0}%
                     </p>
                     <p>
-                      <span className="font-medium">Share Amount:</span>{" "}
+                      <span className="font-medium">
+                        {t("memberDashboardShareAmount")}:
+                      </span>{" "}
                       {member.share_amount || 0}
                     </p>
                   </div>
@@ -746,41 +930,62 @@ const MemberDashboard = () => {
           )}
 
           {activeTab === "settings" && (
-            <div className="max-w-xl mx-auto bg-white border border-gray-100 rounded-2xl shadow p-6 md:p-8">
-              <div className="flex items-center gap-4 pb-5 mb-5 border-b border-gray-100">
+            <div
+              className={`max-w-xl mx-auto rounded-2xl shadow p-6 md:p-8 border ${
+                isDarkMode
+                  ? "bg-slate-700 border-slate-500"
+                  : "bg-white border-gray-100"
+              }`}
+            >
+              <div
+                className={`flex items-center gap-4 pb-5 mb-5 border-b ${
+                  isDarkMode ? "border-slate-500" : "border-gray-100"
+                }`}
+              >
                 <img
                   src={
                     member.profile_image ||
                     "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80"
                   }
-                  alt={member.full_name || "Member"}
+                  alt={member.full_name || t("memberLabel")}
                   className="w-16 h-16 rounded-full object-cover border-4 border-blue-100"
                 />
                 <div>
-                  <p className="text-lg font-semibold text-[#1e3a5f]">
-                    {member.full_name || "Member"}
+                  <p className={`text-lg font-semibold ${accentTextClass}`}>
+                    {member.full_name || t("memberLabel")}
                   </p>
-                  <p className="text-sm text-gray-600">
-                    Employee ID: {member.employee_id || "-"}
+                  <p
+                    className={`text-sm ${
+                      isDarkMode ? "text-slate-200" : "text-gray-600"
+                    }`}
+                  >
+                    {t("memberDashboardEmployeeId")}:{" "}
+                    {member.employee_id || "-"}
                   </p>
                 </div>
               </div>
 
-              <h2 className="text-2xl font-bold text-[#1e3a5f]">
-                Member Settings
+              <h2 className={`text-2xl font-bold ${accentTextClass}`}>
+                {t("memberDashboardMemberSettings")}
               </h2>
-              <p className="text-gray-600 mt-2">
+              <p className={`${subtitleTextClass} mt-2`}>
                 {mustChangePassword
-                  ? "You must change your password now before continuing."
-                  : "You can change your password anytime."}
+                  ? t("memberDashboardMustChangePassword")
+                  : t("memberDashboardCanChangePassword")}
               </p>
 
-              <div className="mt-6 p-4 rounded-xl border border-gray-200 bg-gray-50">
-                <h3 className="text-lg font-semibold text-[#1e3a5f]">
-                  Profile Photo
+              <div
+                className={`mt-6 p-4 rounded-xl border ${
+                  isDarkMode
+                    ? "border-slate-500 bg-slate-600"
+                    : "border-gray-200 bg-gray-50"
+                }`}
+              >
+                <h3 className={`text-lg font-semibold ${accentTextClass}`}>
+                  {t("memberDashboardProfilePhoto")}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Upload a new profile image.
+                <p className={`text-sm mt-1 ${subtitleTextClass}`}>
+                  {t("memberDashboardUploadPhotoHelp")}
                 </p>
 
                 <form
@@ -791,7 +996,9 @@ const MemberDashboard = () => {
                     type="file"
                     accept="image/*"
                     onChange={handleProfileFileChange}
-                    className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-[#1e3a5f] file:text-white hover:file:opacity-90"
+                    className={`block w-full text-sm file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-[#1e3a5f] file:text-white hover:file:opacity-90 ${
+                      isDarkMode ? "text-slate-100" : "text-gray-700"
+                    }`}
                   />
 
                   {imageError && (
@@ -806,15 +1013,21 @@ const MemberDashboard = () => {
                     disabled={imageUploading}
                     className="px-4 py-2 rounded-lg bg-[#1e3a5f] text-white font-semibold disabled:opacity-70"
                   >
-                    {imageUploading ? "Uploading..." : "Update Profile Image"}
+                    {imageUploading
+                      ? t("memberDashboardUploading")
+                      : t("memberDashboardUpdateProfileImage")}
                   </button>
                 </form>
               </div>
 
               <form onSubmit={handlePasswordChange} className="mt-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Current Password
+                  <label
+                    className={`block text-sm font-medium mb-1 ${
+                      isDarkMode ? "text-slate-100" : "text-gray-700"
+                    }`}
+                  >
+                    {t("memberDashboardCurrentPassword")}
                   </label>
                   <input
                     type="password"
@@ -822,13 +1035,17 @@ const MemberDashboard = () => {
                     value={formData.current_password}
                     onChange={handleSettingsInputChange}
                     required
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
+                    className={inputClass}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    New Password
+                  <label
+                    className={`block text-sm font-medium mb-1 ${
+                      isDarkMode ? "text-slate-100" : "text-gray-700"
+                    }`}
+                  >
+                    {t("memberDashboardNewPassword")}
                   </label>
                   <input
                     type="password"
@@ -837,13 +1054,17 @@ const MemberDashboard = () => {
                     onChange={handleSettingsInputChange}
                     required
                     minLength={8}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
+                    className={inputClass}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Confirm New Password
+                  <label
+                    className={`block text-sm font-medium mb-1 ${
+                      isDarkMode ? "text-slate-100" : "text-gray-700"
+                    }`}
+                  >
+                    {t("memberDashboardConfirmNewPassword")}
                   </label>
                   <input
                     type="password"
@@ -852,7 +1073,7 @@ const MemberDashboard = () => {
                     onChange={handleSettingsInputChange}
                     required
                     minLength={8}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
+                    className={inputClass}
                   />
                 </div>
 
@@ -868,7 +1089,9 @@ const MemberDashboard = () => {
                   disabled={isSubmitting}
                   className="w-full px-4 py-2 rounded-lg bg-[#1e3a5f] text-white font-semibold disabled:opacity-70"
                 >
-                  {isSubmitting ? "Updating..." : "Change Password"}
+                  {isSubmitting
+                    ? t("memberDashboardUpdating")
+                    : t("memberDashboardChangePassword")}
                 </button>
               </form>
             </div>
