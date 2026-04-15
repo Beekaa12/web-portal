@@ -39,9 +39,11 @@ const members = [
     about: "Creates intuitive visual systems and clean product experiences.",
     email: "amanuel.sisay@iu.edu.et",
     phone: "+251 933 445 566",
-    linkedin: "https://www.linkedin.com",
-    portfolio: "https://dawit-portfolio.dev",
-    image: "https://cdn-icons-png.flaticon.com/512/9187/9187604.png",
+    linkedin:
+      "https://www.linkedin.com/in/amanuel-sisay-4a4923235/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3B8aIYqxs6R1aIcCOs7o2lLA%3D%3D",
+    portfolio: "https://my-portfolio-frontend-rauk.onrender.com/",
+    image:
+      "https://media.licdn.com/dms/image/v2/D4E35AQFM8QOjWyOIqw/profile-framedphoto-shrink_400_400/B4EZdZJVHoH0Ak-/0/1749547307721?e=1776859200&v=beta&t=MIVGPJiwVyCD-dgCCGc5TFuXnHdq_ekplbx7OGpfc48",
   },
   {
     id: 4,
