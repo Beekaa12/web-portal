@@ -465,7 +465,7 @@ const MemberDashboard = ({ isDarkMode = false }) => {
           className="absolute inset-0 opacity-25"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=2070&q=80')",
+              "url('https://cdn-icons-png.flaticon.com/512/1077/1077114.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -553,6 +553,19 @@ const MemberDashboard = ({ isDarkMode = false }) => {
                   </p>
                   <h3 className={`text-2xl font-bold ${amountTextClass}`}>
                     {formatCurrency(summary.totalBalance)}
+                  </h3>
+                </article>
+
+                <article className={statCardClass}>
+                  <p
+                    className={`text-sm mb-2 ${
+                      isDarkMode ? "text-slate-200" : "text-gray-500"
+                    }`}
+                  >
+                    {t("memberDashboardTotalShareAmount")}
+                  </p>
+                  <h3 className={`text-2xl font-bold ${amountTextClass}`}>
+                    {formatCurrency(member.share_amount)}
                   </h3>
                 </article>
               </div>
@@ -732,7 +745,7 @@ const MemberDashboard = ({ isDarkMode = false }) => {
                 <img
                   src={
                     member.profile_image ||
-                    "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80"
+                    "https://cdn-icons-png.flaticon.com/512/1077/1077114.png"
                   }
                   alt={member.full_name || t("memberLabel")}
                   className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
