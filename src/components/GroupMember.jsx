@@ -35,7 +35,7 @@ const members = [
   {
     id: 3,
     name: "Amanuel Sisay",
-    role: "UI/UX Designer",
+    role: "Full Stack Developer",
     about: "Creates intuitive visual systems and clean product experiences.",
     email: "amanuel.sisay@iu.edu.et",
     phone: "+251 933 445 566",
@@ -48,8 +48,8 @@ const members = [
   {
     id: 4,
     name: "Ahmed Kassaye",
-    role: "QA Engineer",
-    about: "Ensures quality through test coverage and proactive validation.",
+    role: "Full Stack Developer",
+    about: "Builds responsive interfaces and keeps the user journey smooth.",
     email: "ahmed.kassaye@iu.edu.et",
     phone: "+251 944 556 677",
     linkedin: "https://www.linkedin.com",
@@ -59,7 +59,7 @@ const members = [
   {
     id: 5,
     name: "Habtamu Biks",
-    role: "Project Coordinator",
+    role: "Full Stack Developer",
     about: "Coordinates planning, communication, and on-time execution.",
     email: "habtamu.biks@iu.edu.et",
     phone: "+251 955 667 788",
