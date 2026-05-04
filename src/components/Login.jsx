@@ -15,6 +15,7 @@ const Login = ({ isDarkMode = false }) => {
   const [loginError, setLoginError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const sectionBgClass = isDarkMode
     ? "bg-[#2f3d52] min-h-screen"
@@ -39,6 +40,10 @@ const Login = ({ isDarkMode = false }) => {
   const inputClass = isDarkMode
     ? "w-full px-4 py-2 border border-slate-400 bg-slate-600 text-slate-50 placeholder-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
     : "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]";
+
+  const passwordToggleClass = isDarkMode
+    ? "absolute inset-y-0 right-3 flex items-center text-slate-200 hover:text-white"
+    : "absolute inset-y-0 right-3 flex items-center text-slate-600 hover:text-slate-900";
 
   const helperTextClass = isDarkMode
     ? "mt-6 text-center text-sm text-slate-200"
@@ -148,15 +153,59 @@ const Login = ({ isDarkMode = false }) => {
 
               <div>
                 <label className={labelClass}>{t("loginPasswordLabel")}</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className={inputClass}
-                  placeholder="••••••••"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className={`${inputClass} pr-12`}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    className={passwordToggleClass}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={
+                      showPassword
+                        ? t("loginHidePassword")
+                        : t("loginShowPassword")
+                    }
+                  >
+                    {showPassword ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-5 w-5"
+                      >
+                        <path d="M2 12s3.5-7 10-7c2.1 0 3.9.6 5.4 1.4" />
+                        <path d="M22 12s-3.5 7-10 7c-2.1 0-3.9-.6-5.4-1.4" />
+                        <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+                        <path d="M3 3l18 18" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-5 w-5"
+                      >
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -175,7 +224,7 @@ const Login = ({ isDarkMode = false }) => {
             {/* Footer Note */}
             <div className={helperTextClass}>
               {t("loginTrouble")}{" "}
-              <span 
+              <span
                 className="text-[#1e3a5f] font-medium cursor-pointer hover:underline"
                 onClick={() => setShowSupportModal(true)}
               >
@@ -187,9 +236,9 @@ const Login = ({ isDarkMode = false }) => {
       </section>
 
       {/* Help Modal */}
-      <Help 
-        isOpen={showSupportModal} 
-        onClose={() => setShowSupportModal(false)} 
+      <Help
+        isOpen={showSupportModal}
+        onClose={() => setShowSupportModal(false)}
       />
     </div>
   );

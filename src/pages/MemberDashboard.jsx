@@ -30,6 +30,16 @@ const toSavingLabel = (savingType = "") =>
     .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
     .join(" + ") || "-";
 
+const getInitials = (fullName = "") => {
+  const parts = String(fullName).trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return "U";
+  }
+  const first = parts[0]?.[0] || "";
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] || "" : "";
+  return `${first}${last}`.toUpperCase();
+};
+
 const MemberDashboard = ({ isDarkMode = false }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -408,6 +418,12 @@ const MemberDashboard = ({ isDarkMode = false }) => {
   const accentTextClass = isDarkMode ? "text-blue-200" : "text-[#1e3a5f]";
   const amountTextClass = isDarkMode ? "text-slate-100" : "text-[#1e3a5f]";
 
+  const profileLabel = `${member.full_name || t("memberLabel")} ${t("profile")}`;
+  const profileInitials = getInitials(member.full_name || t("memberLabel"));
+  const avatarBaseClass = isDarkMode
+    ? "bg-slate-600 text-slate-100"
+    : "bg-blue-100 text-[#1e3a5f]";
+
   if (loading) {
     return (
       <div className={`${pageBgClass} flex items-center justify-center`}>
@@ -487,14 +503,21 @@ const MemberDashboard = ({ isDarkMode = false }) => {
             <>
               <div className={panelClass}>
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                  <img
-                    src={
-                      member.profile_image ||
-                      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80"
-                    }
-                    alt={`${member.full_name || t("memberLabel")} ${t("profile")}`}
-                    className="w-28 h-28 rounded-full object-cover border-4 border-blue-100"
-                  />
+                  {member.profile_image ? (
+                    <img
+                      src={member.profile_image}
+                      alt={profileLabel}
+                      className="w-28 h-28 rounded-full object-cover border-4 border-blue-100"
+                    />
+                  ) : (
+                    <div
+                      role="img"
+                      aria-label={profileLabel}
+                      className={`w-28 h-28 rounded-full border-4 border-blue-100 flex items-center justify-center text-3xl font-semibold ${avatarBaseClass}`}
+                    >
+                      {profileInitials}
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <h2
@@ -742,14 +765,21 @@ const MemberDashboard = ({ isDarkMode = false }) => {
                   isDarkMode ? "border-slate-500" : "border-gray-100"
                 }`}
               >
-                <img
-                  src={
-                    member.profile_image ||
-                    "https://cdn-icons-png.flaticon.com/512/1077/1077114.png"
-                  }
-                  alt={member.full_name || t("memberLabel")}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
-                />
+                {member.profile_image ? (
+                  <img
+                    src={member.profile_image}
+                    alt={member.full_name || t("memberLabel")}
+                    className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
+                  />
+                ) : (
+                  <div
+                    role="img"
+                    aria-label={member.full_name || t("memberLabel")}
+                    className={`w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-2xl font-semibold ${avatarBaseClass}`}
+                  >
+                    {profileInitials}
+                  </div>
+                )}
                 <div>
                   <h2
                     className={`text-2xl md:text-3xl font-bold ${accentTextClass}`}
@@ -955,14 +985,21 @@ const MemberDashboard = ({ isDarkMode = false }) => {
                   isDarkMode ? "border-slate-500" : "border-gray-100"
                 }`}
               >
-                <img
-                  src={
-                    member.profile_image ||
-                    "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80"
-                  }
-                  alt={member.full_name || t("memberLabel")}
-                  className="w-16 h-16 rounded-full object-cover border-4 border-blue-100"
-                />
+                {member.profile_image ? (
+                  <img
+                    src={member.profile_image}
+                    alt={member.full_name || t("memberLabel")}
+                    className="w-16 h-16 rounded-full object-cover border-4 border-blue-100"
+                  />
+                ) : (
+                  <div
+                    role="img"
+                    aria-label={member.full_name || t("memberLabel")}
+                    className={`w-16 h-16 rounded-full border-4 border-blue-100 flex items-center justify-center text-lg font-semibold ${avatarBaseClass}`}
+                  >
+                    {profileInitials}
+                  </div>
+                )}
                 <div>
                   <p className={`text-lg font-semibold ${accentTextClass}`}>
                     {member.full_name || t("memberLabel")}
@@ -987,51 +1024,53 @@ const MemberDashboard = ({ isDarkMode = false }) => {
                   : t("memberDashboardCanChangePassword")}
               </p>
 
-              <div
-                className={`mt-6 p-4 rounded-xl border ${
-                  isDarkMode
-                    ? "border-slate-500 bg-slate-600"
-                    : "border-gray-200 bg-gray-50"
-                }`}
-              >
-                <h3 className={`text-lg font-semibold ${accentTextClass}`}>
-                  {t("memberDashboardProfilePhoto")}
-                </h3>
-                <p className={`text-sm mt-1 ${subtitleTextClass}`}>
-                  {t("memberDashboardUploadPhotoHelp")}
-                </p>
-
-                <form
-                  onSubmit={handleProfileImageUpload}
-                  className="mt-4 space-y-3"
+              {!mustChangePassword && (
+                <div
+                  className={`mt-6 p-4 rounded-xl border ${
+                    isDarkMode
+                      ? "border-slate-500 bg-slate-600"
+                      : "border-gray-200 bg-gray-50"
+                  }`}
                 >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfileFileChange}
-                    className={`block w-full text-sm file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-[#1e3a5f] file:text-white hover:file:opacity-90 ${
-                      isDarkMode ? "text-slate-100" : "text-gray-700"
-                    }`}
-                  />
+                  <h3 className={`text-lg font-semibold ${accentTextClass}`}>
+                    {t("memberDashboardProfilePhoto")}
+                  </h3>
+                  <p className={`text-sm mt-1 ${subtitleTextClass}`}>
+                    {t("memberDashboardUploadPhotoHelp")}
+                  </p>
 
-                  {imageError && (
-                    <p className="text-sm text-red-600">{imageError}</p>
-                  )}
-                  {imageSuccess && (
-                    <p className="text-sm text-green-700">{imageSuccess}</p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={imageUploading}
-                    className="px-4 py-2 rounded-lg bg-[#1e3a5f] text-white font-semibold disabled:opacity-70"
+                  <form
+                    onSubmit={handleProfileImageUpload}
+                    className="mt-4 space-y-3"
                   >
-                    {imageUploading
-                      ? t("memberDashboardUploading")
-                      : t("memberDashboardUpdateProfileImage")}
-                  </button>
-                </form>
-              </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfileFileChange}
+                      className={`block w-full text-sm file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-[#1e3a5f] file:text-white hover:file:opacity-90 ${
+                        isDarkMode ? "text-slate-100" : "text-gray-700"
+                      }`}
+                    />
+
+                    {imageError && (
+                      <p className="text-sm text-red-600">{imageError}</p>
+                    )}
+                    {imageSuccess && (
+                      <p className="text-sm text-green-700">{imageSuccess}</p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={imageUploading}
+                      className="px-4 py-2 rounded-lg bg-[#1e3a5f] text-white font-semibold disabled:opacity-70"
+                    >
+                      {imageUploading
+                        ? t("memberDashboardUploading")
+                        : t("memberDashboardUpdateProfileImage")}
+                    </button>
+                  </form>
+                </div>
+              )}
 
               <form onSubmit={handlePasswordChange} className="mt-6 space-y-4">
                 <div>
