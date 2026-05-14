@@ -56,6 +56,12 @@ const MemberDashboard = ({ isDarkMode = false }) => {
   const [savingsTransactions, setSavingsTransactions] = useState([]);
   const [transactionsLoading, setTransactionsLoading] = useState(false);
   const [transactionsError, setTransactionsError] = useState("");
+  const [showLoanStatus, setShowLoanStatus] = useState(false);
+  const [memberLoanRequests, setMemberLoanRequests] = useState([]);
+  const [loanStatusLoading, setLoanStatusLoading] = useState(false);
+  const [loanStatusError, setLoanStatusError] = useState("");
+  const [queueSearch, setQueueSearch] = useState("");
+  const [showAllQueueRows, setShowAllQueueRows] = useState(false);
   const [formData, setFormData] = useState({
     current_password: "",
     new_password: "",
@@ -80,6 +86,31 @@ const MemberDashboard = ({ isDarkMode = false }) => {
   const [mustChangePassword, setMustChangePassword] = useState(
     Boolean(memberProfile?.must_change_password),
   );
+
+  const displayedLoanRequests = useMemo(() => {
+    const query = String(queueSearch || "")
+      .trim()
+      .toLowerCase();
+    if (!query) {
+      return memberLoanRequests;
+    }
+
+    return memberLoanRequests.filter((loan) => {
+      const memberIdText = String(loan?.member_id || "").toLowerCase();
+      return memberIdText.includes(query);
+    });
+  }, [memberLoanRequests, queueSearch]);
+
+  const visibleLoanRequests = useMemo(() => {
+    if (showAllQueueRows) {
+      return displayedLoanRequests;
+    }
+    return displayedLoanRequests.slice(0, 10);
+  }, [displayedLoanRequests, showAllQueueRows]);
+
+  useEffect(() => {
+    setShowAllQueueRows(false);
+  }, [queueSearch, memberLoanRequests.length]);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -207,6 +238,66 @@ const MemberDashboard = ({ isDarkMode = false }) => {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const fetchMemberLoanStatuses = async () => {
+    try {
+      setLoanStatusLoading(true);
+      setLoanStatusError("");
+
+      const token = localStorage.getItem("member_token");
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      const response = await fetch(
+        `${API_BASE}/api/loans/pending-queue?minAmount=1000`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        },
+      );
+
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json")
+        ? await response.json()
+        : null;
+
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("member_token");
+        localStorage.removeItem("member_profile");
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (!response.ok || payload?.success === false) {
+        throw new Error(
+          payload?.message || t("memberDashboardLoadLoanStatusFailed"),
+        );
+      }
+
+      setMemberLoanRequests(Array.isArray(payload?.data) ? payload.data : []);
+    } catch (loanError) {
+      console.error("Error loading member loan statuses:", loanError);
+      setMemberLoanRequests([]);
+      setLoanStatusError(
+        loanError.message || t("memberDashboardUnableLoadLoanStatus"),
+      );
+    } finally {
+      setLoanStatusLoading(false);
+    }
+  };
+
+  const handleToggleLoanStatus = async () => {
+    const nextValue = !showLoanStatus;
+    setShowLoanStatus(nextValue);
+
+    if (nextValue) {
+      await fetchMemberLoanStatuses();
+    }
   };
 
   const handleProfileFileChange = (e) => {
@@ -620,6 +711,146 @@ const MemberDashboard = ({ isDarkMode = false }) => {
                     </p>
                   </div>
                 </div>
+
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={handleToggleLoanStatus}
+                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border-2 border-[#1e3a5f] bg-[#1e3a5f] text-white font-semibold shadow-sm hover:bg-[#16304f] hover:border-[#16304f] active:translate-y-px focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/40 transition"
+                  >
+                    {showLoanStatus
+                      ? t("memberDashboardHideLoanStatus")
+                      : t("memberDashboardSeeLoanStatus")}
+                  </button>
+                </div>
+
+                {showLoanStatus && (
+                  <div className="mt-5 overflow-x-auto">
+                    <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                      <input
+                        type="text"
+                        value={queueSearch}
+                        onChange={(e) => setQueueSearch(e.target.value)}
+                        placeholder="Search by member ID"
+                        className={`w-full sm:max-w-xs px-3 py-2 border rounded-lg ${
+                          isDarkMode
+                            ? "border-slate-500 bg-slate-600 text-slate-100 placeholder-slate-300"
+                            : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setQueueSearch(
+                            String(
+                              dashboardData?.member?.employee_id ||
+                                memberProfile?.employee_id ||
+                                "",
+                            ),
+                          )
+                        }
+                        className={`inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold border transition ${
+                          isDarkMode
+                            ? "border-blue-300 bg-blue-100 text-[#0f2742] hover:bg-blue-200"
+                            : "border-[#1e3a5f] bg-white text-[#1e3a5f] hover:bg-blue-50"
+                        }`}
+                      >
+                        Find My Queue
+                      </button>
+                    </div>
+                    <table className="w-full min-w-[700px] text-left">
+                      <thead>
+                        <tr className={tableHeadClass}>
+                          <th className="py-3 pr-4">
+                            {t("memberDashboardDay")}
+                          </th>
+                          <th className="py-3 pr-4">
+                            {t("memberDashboardMemberId")}
+                          </th>
+                          <th className="py-3 px-4">
+                            {t("memberDashboardQueuePosition")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {loanStatusLoading && (
+                          <tr>
+                            <td
+                              className={`py-6 text-center ${
+                                isDarkMode ? "text-slate-200" : "text-gray-500"
+                              }`}
+                              colSpan={3}
+                            >
+                              {t("memberDashboardLoadingLoanStatus")}
+                            </td>
+                          </tr>
+                        )}
+
+                        {!loanStatusLoading && loanStatusError && (
+                          <tr>
+                            <td
+                              className="py-6 text-center text-red-600"
+                              colSpan={3}
+                            >
+                              {loanStatusError}
+                            </td>
+                          </tr>
+                        )}
+
+                        {!loanStatusLoading &&
+                          !loanStatusError &&
+                          visibleLoanRequests.map((loan) => {
+                            return (
+                              <tr
+                                key={`${loan.member_id || "m"}-${loan.queue_position || "q"}-${loan.requested_day || "d"}`}
+                                className={tableRowClass}
+                              >
+                                <td className="py-3 pr-4 font-semibold">
+                                  {formatDate(loan.requested_day)}
+                                </td>
+                                <td className="py-3 pr-4 font-medium">
+                                  {loan.member_id || "-"}
+                                </td>
+                                <td className="py-3 px-4">
+                                  {loan.queue_position || "-"}
+                                </td>
+                              </tr>
+                            );
+                          })}
+
+                        {!loanStatusLoading &&
+                          !loanStatusError &&
+                          displayedLoanRequests.length === 0 && (
+                            <tr>
+                              <td
+                                className={`py-6 text-center ${
+                                  isDarkMode
+                                    ? "text-slate-200"
+                                    : "text-gray-500"
+                                }`}
+                                colSpan={3}
+                              >
+                                {t("memberDashboardNoLoanRequests")}
+                              </td>
+                            </tr>
+                          )}
+                      </tbody>
+                    </table>
+                    {!loanStatusLoading &&
+                      !loanStatusError &&
+                      displayedLoanRequests.length > 10 && (
+                        <div className="mt-4">
+                          <button
+                            type="button"
+                            onClick={() => setShowAllQueueRows((prev) => !prev)}
+                            className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-[#1e3a5f] text-[#1e3a5f] font-semibold hover:bg-blue-50"
+                          >
+                            {showAllQueueRows ? "Show Less" : "See More"}
+                          </button>
+                        </div>
+                      )}
+                  </div>
+                )}
               </div>
 
               <div className={panelClass}>
